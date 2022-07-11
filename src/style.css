@@ -1,7 +1,39 @@
+* {
+    font-family: Arial, Helvetica, sans-serif;
+}
+
 .project-card {
     background-color: aqua;
 }
 
 .item {
-    background-color: red;
+    background-color: skyblue;
+}
+
+body {
+    background-color: oldlace
+}
+
+#content {
+    background-color: antiquewhite;
+}
+#header {
+    width: 100%;
+    height: 50px;
+    background-color: rgb(214, 234, 252);
+}
+
+
+
+.active {
+    display: block;
+    width: 500px;
+    height: 200px;
+    background-color: blueviolet;
+    border: 1px solid brown;
+}
+
+.clear-local-storage-btn {
+    background-color: rebeccapurple;
+    color: white;
 }
