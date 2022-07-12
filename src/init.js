@@ -75,8 +75,10 @@ function createProjectCard(project) {
     delBtn.id = 'delete-project-btn';
     delBtn.innerText = 'x';
     delBtn.addEventListener('click', (e) => {
+        // could be its own removeProject function
         const indexToRemove = (_projects.findIndex((proj) => proj.title == getProject(project.title).title));
         _projects.splice(indexToRemove, 1);
+        saveLocal();
         updatePage();
     })
 
@@ -373,7 +375,7 @@ const restoreLocal = () => {
 
     if(projects === null) {
         console.log('null boy')
-        _projects = [createProject('Default'), createProject('Default 2'), createProject('Default 3')]
+        _projects = [createProject('Default')]
         updatePage();
         return
     }
@@ -383,8 +385,8 @@ const restoreLocal = () => {
         console.log('_projects: ' + _projects)
         updatePage(); 
     } else {
-        console.log('no local found. initializing....')
-        _projects = [createProject('Default'), createProject('Default_2'), createProject('Relaunch_Chamilitary')];
+        console.log('_projects is empty. initializing....')
+        _projects = [createProject('Default')];
         updatePage();
     }
 }
