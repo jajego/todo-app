@@ -1,13 +1,11 @@
 // import loadHome from './pages/home';
 
 // TODO
-// Determine why modal loads in with display:none and add btn must be clicked twicec
 // revisit js_playground!
-// Make priority a dropdown
 // Make date a date input
-// Allow spaces in project names
-// Fix modal being active
-
+// Create project button
+// Good front end
+// Remove task, complete task (2 separate inputs ? delete hidden in a ... --> edit menu?)
 
 class Item {
     constructor(title, description, dueDate, priority, project) {
@@ -47,7 +45,7 @@ function createItem(title, description, dueDate, priority, project) {
 function createItemCard(item) {
     let itemCard = document.createElement('div');
     itemCard.classList.add('item') 
-    itemCard.classList.add(item.priority); 
+    // itemCard.classList.add(item.priority); 
     itemCard.innerHTML =    `
                             <h4 class='title'>${item.title}</h3>
                             <p class='description'>Desc: ${item.description}</p>
@@ -72,7 +70,17 @@ function createProjectCard(project) {
     projectCard.innerHTML = `<h1 class='project-card-title'>Project: ${project.title}</h1>`;
     project.id = project.title;
     projectCard.classList.add('project-card')
-    projectCard.classList.add(project.title)
+
+    const delBtn = document.createElement('div');
+    delBtn.id = 'delete-project-btn';
+    delBtn.innerText = 'x';
+    delBtn.addEventListener('click', (e) => {
+        const indexToRemove = (_projects.findIndex((proj) => proj.title == getProject(project.title).title));
+        _projects.splice(indexToRemove, 1);
+        updatePage();
+    })
+
+    projectCard.appendChild(delBtn);
 
     for(let item of project.items){
         projectCard.appendChild(createItemCard(item));
@@ -98,7 +106,7 @@ function createProjectCardNav() {
     addItemBtn.classList.add('add-item-btn');
     addItemBtn.innerHTML = 'Add todo';
     addItemBtn.addEventListener('click', () => {
-        if(addItemModal.classList.contains('active')) {
+        if(addItemModal.classList.contains('opened')) {
             return false;
         } else {        
             openAddItemModal();
@@ -147,19 +155,20 @@ function updateDropdown() {
 function createAddItemModal() {
     const addItemModal    = document.createElement('div');
     addItemModal.classList.add('add-item-modal');
+    addItemModal.classList.add('closed');
     addItemModal.id       = 'add-item-modal';
 
     const addItemForm = document.createElement('form');
     addItemForm.id    = 'add-item-form';
 
-    const dropdown = document.createElement('select');
-    dropdown.id = 'selectProject';
+    const dropdownProjects = document.createElement('select');
+    dropdownProjects.id = 'selectProject';
     for(let i=0; i<_projects.length; i++) {
         let project = _projects[i];
         const option = document.createElement('option');
         option.value = project.title;
         option.innerText = project.title;
-        dropdown.appendChild(option);
+        dropdownProjects.appendChild(option);
     }    
 
     const itemTitleLabel     = document.createElement('label');
@@ -180,19 +189,38 @@ function createAddItemModal() {
     
     const itemDueDateLabel     = document.createElement('label');
     itemDueDateLabel.id = 'itemDueDate'
-    itemDueDateLabel.innerText = 'DueDate:'
+    itemDueDateLabel.innerText = 'Due date:'
     const itemDueDateInput     = document.createElement('input');
     itemDueDateInput.type      = 'text';
     itemDueDateInput.id        = 'new-item-duedate';
     itemDueDateInput.name      = 'itemDueDate';
     
-    const itemPriorityLabel     = document.createElement('label');
-    itemPriorityLabel.id = 'itemPriority'
-    itemPriorityLabel.innerText = 'Priority:'
-    const itemPriorityInput     = document.createElement('input');
-    itemPriorityInput.type      = 'text';
-    itemPriorityInput.id        = 'new-item-priority';
-    itemPriorityInput.name      = 'itemPriority';
+    const dropdownPriority = document.createElement('select');
+    const dropdownPriorityLabel = document.createElement('label');
+    dropdownPriority.id = 'selectPriority';
+    dropdownPriorityLabel.id = 'selectPriorityLabel';
+    dropdownPriorityLabel.innerText = 'Priority: '
+    const lowPriority = document.createElement('option');
+    lowPriority.value = 'Low';
+    lowPriority.innerText = 'Low';
+    const mediumPriority = document.createElement('option');
+    mediumPriority.value = 'Medium';
+    mediumPriority.innerText = 'Medium';
+    const highPriority = document.createElement('option');
+    highPriority.value = 'High';
+    highPriority.innerText = 'High';
+
+    dropdownPriority.appendChild(lowPriority)
+    dropdownPriority.appendChild(mediumPriority)
+    dropdownPriority.appendChild(highPriority)
+
+    // const itemPriorityLabel     = document.createElement('label');
+    // itemPriorityLabel.id = 'itemPriority'
+    // itemPriorityLabel.innerText = 'Priority:'
+    // const itemPriorityInput     = document.createElement('input');
+    // itemPriorityInput.type      = 'text';
+    // itemPriorityInput.id        = 'new-item-priority';
+    // itemPriorityInput.name      = 'itemPriority';
     
     const submitBtn = document.createElement('button');
     submitBtn.type = 'submit';
@@ -200,15 +228,17 @@ function createAddItemModal() {
     submitBtn.innerText = 'Submit'
 
 
-    addItemForm.appendChild(dropdown);
+    addItemForm.appendChild(dropdownProjects);
     addItemForm.appendChild(itemTitleLabel);
     addItemForm.appendChild(itemTitleInput);
     addItemForm.appendChild(itemDescLabel);
     addItemForm.appendChild(itemDescInput);
     addItemForm.appendChild(itemDueDateLabel);
     addItemForm.appendChild(itemDueDateInput);
-    addItemForm.appendChild(itemPriorityLabel);
-    addItemForm.appendChild(itemPriorityInput);
+    addItemForm.appendChild(dropdownPriorityLabel)
+    addItemForm.appendChild(dropdownPriority);
+    // addItemForm.appendChild(itemPriorityLabel);
+    // addItemForm.appendChild(itemPriorityInput);
     addItemForm.appendChild(submitBtn);
 
 
@@ -222,29 +252,26 @@ function openAddItemModal() {
     const addItemModal = document.getElementById('add-item-modal');
     const addItemForm = document.getElementById('add-item-form');
     addItemForm.reset();
-    addItemModal.classList.add('active');
+    addItemModal.classList.remove('closed');
+    addItemModal.classList.add('opened');
 }
 
 function closeAddItemModal() {
     const addItemModal = document.getElementById('add-item-modal');
     const addItemForm = document.getElementById('add-item-form');
     addItemForm.reset();
-    addItemModal.classList.remove('active');
+    addItemModal.classList.remove('opened');
+    addItemModal.classList.add('closed');
 }
 
 
 function processFormData() {
     // need to pass along form results to project.addItem(etc);
     const title    = document.getElementById('new-item-title').value
-    console.log(title)
     const desc     = document.getElementById('new-item-desc').value
-    console.log(desc)
     const dueDate  = document.getElementById('new-item-duedate').value
-    console.log(dueDate)
-    const priority = document.getElementById('new-item-priority').value
-    console.log(priority)
+    const priority = document.getElementById('selectPriority').value
     const project  = document.getElementById('selectProject').value
-    console.log(project)
 
     return createItem(title, desc, dueDate, priority, project)
 }
@@ -346,7 +373,7 @@ const restoreLocal = () => {
 
     if(projects === null) {
         console.log('null boy')
-        _projects = [createProject('Default'), createProject('Default_2'), createProject('Default_3')]
+        _projects = [createProject('Default'), createProject('Default 2'), createProject('Default 3')]
         updatePage();
         return
     }
