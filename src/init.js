@@ -3,8 +3,7 @@
 // TODO
 // revisit js_playground!
 // Make date a date input
-// Create project button
-// Good front end
+// front end
 // Remove task, complete task (2 separate inputs ? delete hidden in a ... --> edit menu?)
 
 class Item {
@@ -59,7 +58,6 @@ function createProject(title) {
     let project = new Project(title);
     let defaultItem = createItem('Default', 'This is a default task', 'Tomorrow', 'Soon', title)
     project.items.push(defaultItem)
-    _projects.push(project);
     saveLocal();
     
     return project;
@@ -91,8 +89,9 @@ function createProjectCard(project) {
     return projectCard;
 }
 
-function createProjectCardNav() {
+function createAppNav() {
     const addItemModal = document.getElementById('add-item-modal');
+    const addProjectModal = document.getElementById('add-project-modal');
 
     const projectCardNav = document.createElement('nav');
 
@@ -102,7 +101,11 @@ function createProjectCardNav() {
     addProjectBtn.classList.add('add-project-btn');
     addProjectBtn.innerHTML = 'Add project';
     addProjectBtn.addEventListener('click', () => {
-        
+        if(addProjectModal.classList.contains('opened')) {
+            return false;
+        } else {        
+            openAddProjectModal();
+        }
     })
 
     addItemBtn.classList.add('add-item-btn');
@@ -131,8 +134,9 @@ function createProjectCardNav() {
         console.log('localStorage cleared')
     })
     
+    projectCardNav.appendChild(addProjectBtn);
     projectCardNav.appendChild(addItemBtn);
-    projectCardNav.appendChild(editProjectTitleBtn);
+    // projectCardNav.appendChild(editProjectTitleBtn);
     projectCardNav.appendChild(clearLocalStorageBtn)
 
     return projectCardNav;
@@ -154,9 +158,39 @@ function updateDropdown() {
     })
 }
 
+function createAddProjectModal() {
+    const addProjectModal = document.createElement('div');
+    addProjectModal.classList.add('closed');
+    addProjectModal.id = 'add-project-modal';
+
+    const addProjectForm = document.createElement('form');
+    addProjectForm.id = 'add-project-form';
+
+    const projectTitleLabel = document.createElement('label');
+    projectTitleLabel.id = 'new-project-title'
+    projectTitleLabel.innerText = 'Project title: '
+
+    const projectTitleInput = document.createElement('input');
+    projectTitleInput.type = 'text';
+    projectTitleInput.id = 'project-title-input';
+    projectTitleInput.name = 'new-project-title';
+
+    const submitBtn = document.createElement('button');
+    submitBtn.type = 'submit';
+    submitBtn.innerText = 'Submit';
+
+    addProjectForm.appendChild(projectTitleLabel)
+    addProjectForm.appendChild(projectTitleInput)
+    addProjectForm.appendChild(submitBtn);
+    addProjectForm.onsubmit = addProject;
+
+    addProjectModal.appendChild(addProjectForm);
+
+    return addProjectModal;
+}
+
 function createAddItemModal() {
     const addItemModal    = document.createElement('div');
-    addItemModal.classList.add('add-item-modal');
     addItemModal.classList.add('closed');
     addItemModal.id       = 'add-item-modal';
 
@@ -250,6 +284,22 @@ function createAddItemModal() {
     return addItemModal;
 }
 
+function openAddProjectModal() {
+    const addProjectModal = document.getElementById('add-project-modal');
+    const addProjectForm = document.getElementById('add-project-form');
+    addProjectForm.reset();
+    addProjectModal.classList.remove('closed');
+    addProjectModal.classList.add('opened');
+}
+
+function closeAddProjectModal() {
+    const addProjectModal = document.getElementById('add-project-modal');
+    const addProjectForm = document.getElementById('add-project-form');
+    addProjectForm.reset();
+    addProjectModal.classList.remove('opened');
+    addProjectModal.classList.add('closed');
+}
+
 function openAddItemModal() {
     const addItemModal = document.getElementById('add-item-modal');
     const addItemForm = document.getElementById('add-item-form');
@@ -266,9 +316,12 @@ function closeAddItemModal() {
     addItemModal.classList.add('closed');
 }
 
+function processProjectFormData() {
+    const title = document.getElementById('project-title-input').value;
+    return createProject(title)
+}
 
-function processFormData() {
-    // need to pass along form results to project.addItem(etc);
+function processItemFormData() {
     const title    = document.getElementById('new-item-title').value
     const desc     = document.getElementById('new-item-desc').value
     const dueDate  = document.getElementById('new-item-duedate').value
@@ -278,9 +331,21 @@ function processFormData() {
     return createItem(title, desc, dueDate, priority, project)
 }
 
+function addProject(e) {
+    console.log('Adding project')
+    e.preventDefault();
+    const newProject = processProjectFormData();
+    _projects.push(newProject);
+
+    saveLocal();
+    updatePage();
+
+    closeAddProjectModal();
+}
+
 function addItem(e) {
     e.preventDefault();
-    const newItem = processFormData();
+    const newItem = processItemFormData();
     console.log('Succsesfully processed form data')
     const project = getProject(newItem.project);
     let indexOfProject = _projects.findIndex((project) => project.title == newItem.project);
@@ -300,8 +365,6 @@ function renderProjectCards() {
     const main = document.getElementById('main');
     main.innerHTML = '';
     let projects = _projects;
-
- 
 
     for(let i = 0; i < projects.length; i++) {
         let projectCard = createProjectCard(projects[i]);
@@ -350,12 +413,13 @@ function initTodoApp() {
 
     content.appendChild(createHeader());
     content.appendChild(createAddItemModal());
+    content.appendChild(createAddProjectModal());
 
     content.appendChild(createMain());
     content.appendChild(createFooter());
     
     const header = document.getElementById('header')
-    header.appendChild(createProjectCardNav());
+    header.appendChild(createAppNav());
 
     restoreLocal();
 }
