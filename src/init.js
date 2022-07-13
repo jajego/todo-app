@@ -43,13 +43,13 @@ function createItem(title, description, dueDate, priority, project) {
 
 function createItemCard(item) {
     let itemCard = document.createElement('div');
-    itemCard.classList.add('item') 
+    itemCard.classList.add('item-card') 
     // itemCard.classList.add(item.priority); 
     itemCard.innerHTML =    `
-                            <h4 class='title'>${item.title}</h3>
-                            <p class='description'>Desc: ${item.description}</p>
-                            <p class='due-date'>Due: ${item.dueDate}</p>
-                            <p class='priority'>Priority: ${item.priority}</p>
+                            <h4 class='item-title'>${item.title}</h3>
+                            <p class='item-description'>Desc: ${item.description}</p>
+                            <p class='item-due-date'>Due: ${item.dueDate}</p>
+                            <p class='item-priority'>Priority: ${item.priority}</p>
                             `
     return itemCard;
 }
@@ -65,12 +65,15 @@ function createProject(title) {
 
 function createProjectCard(project) {
     const projectCard = document.createElement('div');
-    projectCard.innerHTML = `<h1 class='project-card-title'>Project: ${project.title}</h1>`;
     project.id = project.title;
     projectCard.classList.add('project-card')
 
+    const projectCardTitle = document.createElement('h1');
+    projectCardTitle.classList.add('project-card-title');
+    projectCardTitle.textContent = `Project: ${project.title}`;
+
     const delBtn = document.createElement('div');
-    delBtn.id = 'delete-project-btn';
+    delBtn.classList.add('delete-project-btn');
     delBtn.innerText = 'x';
     delBtn.addEventListener('click', (e) => {
         // could be its own removeProject function
@@ -81,6 +84,7 @@ function createProjectCard(project) {
     })
 
     projectCard.appendChild(delBtn);
+    projectCard.appendChild(projectCardTitle);
 
     for(let item of project.items){
         projectCard.appendChild(createItemCard(item));
