@@ -335,6 +335,7 @@ function addProject(e) {
     console.log('Adding project')
     e.preventDefault();
     const newProject = processProjectFormData();
+    console.log('Successfully processed project form data')
     _projects.push(newProject);
 
     saveLocal();
@@ -346,7 +347,7 @@ function addProject(e) {
 function addItem(e) {
     e.preventDefault();
     const newItem = processItemFormData();
-    console.log('Succsesfully processed form data')
+    console.log('Succsesfully processed item form data')
     const project = getProject(newItem.project);
     let indexOfProject = _projects.findIndex((project) => project.title == newItem.project);
     _projects[indexOfProject].items.push(newItem);
