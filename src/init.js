@@ -5,14 +5,22 @@
 // Make date a date input
 // front end
 // Remove task, complete task (2 separate inputs ? delete hidden in a ... --> edit menu?)
+// In progress & complete project columns
+// Complete styles
+// Remove description
+// Default project not saving to _projects/local storage
+// Uncheck completed tasks
+// New tasks should come after one another, but always before completed tasks 
+//      - 2 separate attributes/ this.tasks, this.completeTask
+            // however this is needlessly more complicated?
 
 class Item {
-    constructor(title, description, dueDate, priority, project) {
+    constructor(title, dueDate, priority, project) {
         this.title = title;
-        this.description = description;
         this.dueDate = dueDate;
         this.priority = priority;
         this.project = project;
+        this.isComplete = false;
     }
 }
 
@@ -20,6 +28,7 @@ class Project {
     constructor(title) {
         this.title = title;
         this.items = [];
+        this.isComplete = false;
     }
 
     addToItems(item) {
@@ -35,29 +44,41 @@ class Project {
     }
 }
 
-let _projects = [];
+let _projects = [new Project('Default')];
 
-function createItem(title, description, dueDate, priority, project) {
-    return new Item(title, description, dueDate, priority, project)
+function createItem(title, dueDate, priority, project) {
+    return new Item(title, dueDate, priority, project)
 }
 
 function createItemCard(item) {
     let itemCard = document.createElement('div');
+    let itemCompleteBtn = document.createElement('div');
+    itemCompleteBtn.innerHTML = 'O'
+    itemCompleteBtn.classList.add('item-complete-btn');
+    itemCompleteBtn.addEventListener('click', (e) => {
+        console.log(e.target);
+        completeItem(item)
+        completeItemCard(e.target.parentNode)
+    })
     itemCard.classList.add('item-card') 
     // itemCard.classList.add(item.priority); 
     itemCard.innerHTML =    `
                             <h4 class='item-title'>${item.title}</h3>
-                            <p class='item-description'>Desc: ${item.description}</p>
                             <p class='item-due-date'>Due: ${item.dueDate}</p>
                             <p class='item-priority'>Priority: ${item.priority}</p>
                             `
+
+    if(item.isComplete){
+        itemCard.classList.add('item-card-complete')
+    }
+    itemCard.appendChild(itemCompleteBtn);
     return itemCard;
 }
 
 function createProject(title) {
     let project = new Project(title);
-    let defaultItem = createItem('Default', 'This is a default task', 'Tomorrow', 'Soon', title)
-    project.items.push(defaultItem)
+    // let defaultItem = createItem('Default', 'This is a default task', 'Tomorrow', 'Soon', title)
+    // project.items.push(defaultItem)
     saveLocal();
     
     return project;
@@ -70,7 +91,7 @@ function createProjectCard(project) {
 
     const projectCardTitle = document.createElement('h1');
     projectCardTitle.classList.add('project-card-title');
-    projectCardTitle.textContent = `Project: ${project.title}`;
+    projectCardTitle.textContent = `${project.title}`;
 
     const delBtn = document.createElement('div');
     delBtn.classList.add('delete-project-btn');
@@ -79,7 +100,6 @@ function createProjectCard(project) {
         // could be its own removeProject function
         const indexToRemove = (_projects.findIndex((proj) => proj.title == getProject(project.title).title));
         _projects.splice(indexToRemove, 1);
-        saveLocal();
         updatePage();
     })
 
@@ -91,6 +111,28 @@ function createProjectCard(project) {
     }
     
     return projectCard;
+}
+
+function completeProject(project) {
+    return project.isComplete = true;
+}
+
+function completeProjectOnCard(e) {
+
+}
+
+function completeItem(itemToComplete) {
+    itemToComplete.isComplete = true;
+    const project = getProject(itemToComplete.project);
+    const indexOfItem = project.items.findIndex(item => item.title === itemToComplete.title);
+    project.items.push(project.items.splice(indexOfItem, 1)[0])
+
+}
+function completeItemCard(itemCard) {
+    console.log('-------------')
+    console.log(itemCard);
+    itemCard.classList.add('item-card-complete')
+    updatePage();
 }
 
 function createAppNav() {
@@ -219,14 +261,6 @@ function createAddItemModal() {
     itemTitleInput.id        = 'new-item-title';
     itemTitleInput.name      = 'itemTitle';
     
-    const itemDescLabel     = document.createElement('label');
-    itemDescLabel.id = 'itemDesc';
-    itemDescLabel.innerText = 'Desc:'
-    const itemDescInput     = document.createElement('input');
-    itemDescInput.type      = 'text';
-    itemDescInput.id        = 'new-item-desc';
-    itemDescInput.name      = 'itemDesc';
-    
     const itemDueDateLabel     = document.createElement('label');
     itemDueDateLabel.id = 'itemDueDate'
     itemDueDateLabel.innerText = 'Due date:'
@@ -271,8 +305,6 @@ function createAddItemModal() {
     addItemForm.appendChild(dropdownProjects);
     addItemForm.appendChild(itemTitleLabel);
     addItemForm.appendChild(itemTitleInput);
-    addItemForm.appendChild(itemDescLabel);
-    addItemForm.appendChild(itemDescInput);
     addItemForm.appendChild(itemDueDateLabel);
     addItemForm.appendChild(itemDueDateInput);
     addItemForm.appendChild(dropdownPriorityLabel)
@@ -327,12 +359,11 @@ function processProjectFormData() {
 
 function processItemFormData() {
     const title    = document.getElementById('new-item-title').value
-    const desc     = document.getElementById('new-item-desc').value
     const dueDate  = document.getElementById('new-item-duedate').value
     const priority = document.getElementById('selectPriority').value
     const project  = document.getElementById('selectProject').value
 
-    return createItem(title, desc, dueDate, priority, project)
+    return createItem(title, dueDate, priority, project)
 }
 
 function addProject(e) {
@@ -430,6 +461,7 @@ function initTodoApp() {
 }
 
 const updatePage = () => {
+    saveLocal();
     resetPage();
     renderProjectCards();
 }
@@ -444,7 +476,7 @@ const restoreLocal = () => {
 
     if(projects === null) {
         console.log('null boy')
-        _projects = [createProject('Default')]
+        // _projects = [createProject('Default')]
         updatePage();
         return
     }
@@ -455,13 +487,9 @@ const restoreLocal = () => {
         updatePage(); 
     } else {
         console.log('_projects is empty. initializing....')
-        _projects = [createProject('Default')];
+        // _projects = [createProject('Default')];
         updatePage();
     }
-}
-
-const JSONToProject = (project) => {
-    return new Project(project.title)
 }
 
 export default initTodoApp;

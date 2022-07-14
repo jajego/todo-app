@@ -15,12 +15,13 @@ body {
 .project-card {
     display: flex;
     flex-direction: column;
-    background-color: aqua;
+    background-color: rgb(184, 255, 255);
     width: 450px;
-    height: 400px;
+    height: 70%;
     padding: 10px;
     margin: 15px;
-    box-shadow: 10px 10px tan;
+    border: 1px solid blue;
+    box-shadow: -8px 8px tan;
 }
 
 .project-card-title {
@@ -51,6 +52,10 @@ body {
 .item-due-date,
 .item-priority {
     font-size: 0.8rem;
+}
+
+.item-card-complete {
+    color: lightgray;
 }
 
 
