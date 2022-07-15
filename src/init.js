@@ -7,12 +7,13 @@
 // Remove task, complete task (2 separate inputs ? delete hidden in a ... --> edit menu?)
 // In progress & complete project columns
 // Complete styles
-// Remove description
-// Default project not saving to _projects/local storage
-// Uncheck completed tasks
+// Undo completed tasks
 // New tasks should come after one another, but always before completed tasks 
 //      - 2 separate attributes/ this.tasks, this.completeTask
             // however this is needlessly more complicated?
+// Preference to send completed tasks to beginning or end or list
+
+// import 'date-fns';
 
 class Item {
     constructor(title, dueDate, priority, project) {
@@ -28,6 +29,7 @@ class Project {
     constructor(title) {
         this.title = title;
         this.items = [];
+        this.completedItems = [];
         this.isComplete = false;
     }
 
@@ -55,10 +57,9 @@ function createItemCard(item) {
     let itemCompleteBtn = document.createElement('div');
     itemCompleteBtn.innerHTML = 'O'
     itemCompleteBtn.classList.add('item-complete-btn');
-    itemCompleteBtn.addEventListener('click', (e) => {
-        console.log(e.target);
+    itemCompleteBtn.addEventListener('click', () => {
         completeItem(item)
-        completeItemCard(e.target.parentNode)
+        itemCard.classList.add('item-card-complete')
     })
     itemCard.classList.add('item-card') 
     // itemCard.classList.add(item.priority); 
@@ -79,7 +80,7 @@ function createProject(title) {
     let project = new Project(title);
     // let defaultItem = createItem('Default', 'This is a default task', 'Tomorrow', 'Soon', title)
     // project.items.push(defaultItem)
-    saveLocal();
+    updatePage();
     
     return project;
 }
@@ -109,6 +110,9 @@ function createProjectCard(project) {
     for(let item of project.items){
         projectCard.appendChild(createItemCard(item));
     }
+    for(let item of project.completedItems){
+        projectCard.appendChild(createItemCard(item));
+    }
     
     return projectCard;
 }
@@ -117,23 +121,35 @@ function completeProject(project) {
     return project.isComplete = true;
 }
 
-function completeProjectOnCard(e) {
-
-}
-
 function completeItem(itemToComplete) {
-    itemToComplete.isComplete = true;
     const project = getProject(itemToComplete.project);
     const indexOfItem = project.items.findIndex(item => item.title === itemToComplete.title);
-    project.items.push(project.items.splice(indexOfItem, 1)[0])
+    console.log('~~~~~~')
+    console.log(project.items[indexOfItem])
+    itemToComplete.isComplete = true;
 
-}
-function completeItemCard(itemCard) {
-    console.log('-------------')
-    console.log(itemCard);
-    itemCard.classList.add('item-card-complete')
+    // moves item from project.items to beginning of project.completedItems
+    project.completedItems.unshift(itemToComplete)
+    project.items.splice(indexOfItem, 1)
+    
     updatePage();
 }
+
+
+// function sendCompletedToBack() {
+//     // Sends all completed tasks of all projects to end of their lists
+//     for(let project of _projects) {
+//         for(let j = 0; j < project.items.length; j++){
+//             if(project.items[j].isComplete) {
+//                 project.items.push(project.items.splice(j, 1)[0])
+//                 console.log(project.items)
+//             }
+//         }
+
+     
+//     }
+
+// }
 
 function createAppNav() {
     const addItemModal = document.getElementById('add-item-modal');
@@ -265,7 +281,7 @@ function createAddItemModal() {
     itemDueDateLabel.id = 'itemDueDate'
     itemDueDateLabel.innerText = 'Due date:'
     const itemDueDateInput     = document.createElement('input');
-    itemDueDateInput.type      = 'text';
+    itemDueDateInput.type      = 'date';
     itemDueDateInput.id        = 'new-item-duedate';
     itemDueDateInput.name      = 'itemDueDate';
     
@@ -373,7 +389,6 @@ function addProject(e) {
     console.log('Successfully processed project form data')
     _projects.push(newProject);
 
-    saveLocal();
     updatePage();
 
     closeAddProjectModal();
@@ -387,7 +402,6 @@ function addItem(e) {
     let indexOfProject = _projects.findIndex((project) => project.title == newItem.project);
     _projects[indexOfProject].items.push(newItem);
 
-    saveLocal();
     updatePage();
 
     closeAddItemModal();
@@ -456,7 +470,8 @@ function initTodoApp() {
     
     const header = document.getElementById('header')
     header.appendChild(createAppNav());
-
+    console.log('date date')
+    // console.log(isAfter(new Date(1995, 11, 17), new Date(1997, 10, 5)))
     restoreLocal();
 }
 
