@@ -9,19 +9,44 @@ body {
     /* background-color: oldlace; */
     height: 100vh;
     width: 100%;
-    background-color: antiquewhite;
+    background-color: white;
+}
+
+#add-item-modal, 
+#add-project-modal {
+    position: absolute;
 }
 
 .project-card {
     display: flex;
     flex-direction: column;
-    background-color: rgb(184, 255, 255);
+    background-color: rgb(223, 223, 223);
     width: 450px;
     height: 70%;
     padding: 10px;
     margin: 15px;
-    border: 1px solid blue;
-    box-shadow: -8px 8px tan;
+    
+}
+
+.project-card-header {
+    display: flex;
+    justify-content: space-between;
+    padding: 5px;
+    margin-bottom: 10px;
+}
+
+.project-card-btn-container {
+    display: flex;
+    gap: 5px;
+}
+
+.project-item-card-container {
+    
+}
+
+.completed-project {
+    color: lightcyan;
+    background-color: darkgray;
 }
 
 .project-card-title {
@@ -29,21 +54,32 @@ body {
     width: 75%;
 }
 
-.delete-project-btn {
-    display: inline-block;
-    font-family: 'Courier New', Courier, monospace;
-    height: 5px;
-    width: 5px;
-    margin-left: 98%;
-}
+
 
 .item-card {
+    display: flex;
+    justify-content: space-between;
     background-color: skyblue;
     padding: 15px;
-    margin: 5px;
     margin-bottom: 15px;
     /* border: 1px dotted rosybrown; */
-    /* border-radius: 35%; */
+    border-radius: 15px;
+}
+
+.item-card-left {
+    display: flex;
+    justify-content: flex-start;
+    gap: 10px;
+    align-items: center;
+}
+
+.item-card-complete {
+    opacity: 15%;
+}
+
+.item-card-btn-container {
+    display: flex;
+    gap: 5px;
 }
 .item-title {
     font-size: 1.25rem;
@@ -54,14 +90,12 @@ body {
     font-size: 0.8rem;
 }
 
-.item-card-complete {
-    color: lightgray;
-}
+
 
 
 
 #content {
-    background-color: antiquewhite;
+    background-color: white;
     height: 100%;
     width: 100%;
 }
@@ -98,3 +132,51 @@ body {
     background-color: rebeccapurple;
     color: white;
 }
+
+button {
+    appearance: none;
+    background-color: #FAFBFC;
+    border: 1px solid rgba(27, 31, 35, 0.15);
+    border-radius: 6px;
+    box-shadow: rgba(27, 31, 35, 0.04) 0 1px 0, rgba(255, 255, 255, 0.25) 0 1px 0 inset;
+    box-sizing: border-box;
+    color: #24292E;
+    cursor: pointer;
+    display: inline-block;
+    font-family: -apple-system, system-ui, "Segoe UI", Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji";
+    font-size: 14px;
+    font-weight: 500;
+    line-height: 20px;
+    list-style: none;
+    padding: 6px 16px;
+    position: relative;
+    transition: background-color 0.2s cubic-bezier(0.3, 0, 0.5, 1);
+    user-select: none;
+    -webkit-user-select: none;
+    touch-action: manipulation;
+    vertical-align: middle;
+    white-space: nowrap;
+    word-wrap: break-word;
+}
+
+.delete-project-btn {
+}
+
+.complete-project-btn {
+
+}
+
+.item-complete-btn {
+    width: 18px;
+    height: 18px;
+    background-color: green;
+    border-radius: 50%;
+}
+
+.item-remove-btn {
+    width: 15px;
+    height: 15px;
+    background-color: rgb(255, 157, 157);
+    border-radius: 50%;
+}
+

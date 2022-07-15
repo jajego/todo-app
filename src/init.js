@@ -1,19 +1,25 @@
 // import loadHome from './pages/home';
 
 // TODO
-// revisit js_playground!
-// Make date a date input
 // front end
-// Remove task, complete task (2 separate inputs ? delete hidden in a ... --> edit menu?)
 // In progress & complete project columns
-// Complete styles
-// Undo completed tasks
+// Undo completed tasks (Complete button currently just copies itself)
 // New tasks should come after one another, but always before completed tasks 
 //      - 2 separate attributes/ this.tasks, this.completeTask
             // however this is needlessly more complicated?
 // Preference to send completed tasks to beginning or end or list
+// Form validation
+// View all tasks (sort by urgency) (no project)
+// Sort tasks per project
+// add more divs(containers) for formatting
+// drag n drop
+// buttons dont work on completed projects
+// close all modals when one is clicked to open
+// sidebar (App, Stats)
+// Footer can have switches
+// Default landing (Projeecst go here! dotted box)
 
-// import 'date-fns';
+import {isAfter, format, getDay} from 'date-fns';
 
 class Item {
     constructor(title, dueDate, priority, project) {
@@ -46,33 +52,63 @@ class Project {
     }
 }
 
-let _projects = [new Project('Default')];
+let _projects = [];
+let _completedProjects = [];
 
 function createItem(title, dueDate, priority, project) {
     return new Item(title, dueDate, priority, project)
 }
 
 function createItemCard(item) {
-    let itemCard = document.createElement('div');
-    let itemCompleteBtn = document.createElement('div');
-    itemCompleteBtn.innerHTML = 'O'
+    const itemCard = document.createElement('div');
+    const itemContentContainer = document.createElement('div');
+    const left = document.createElement('div');
+    const itemCompleteBtn = document.createElement('div');
+    const itemTitle = document.createElement('h4');
+    const itemDueDate = document.createElement('p')
+    const itemPriority = document.createElement('p')
+    const right = document.createElement('div');
+    const removeItemBtn = document.createElement('div');
+
+    itemCard.classList.add('item-card')
+    left.classList.add('item-card-left') 
+    itemContentContainer.classList.add('item-card-content');
+    itemTitle.classList.add('item-title');
+    itemDueDate.classList.add('item-due-date');
+    itemPriority.classList.add('item-priority');
+    right.classList.add('item-card-btn-container')
+    itemCompleteBtn.classList.add('item-card-btn');
     itemCompleteBtn.classList.add('item-complete-btn');
+    removeItemBtn.classList.add('item-remove-btn');
+    removeItemBtn.classList.add('item-card-btn');
+
     itemCompleteBtn.addEventListener('click', () => {
         completeItem(item)
         itemCard.classList.add('item-card-complete')
     })
-    itemCard.classList.add('item-card') 
-    // itemCard.classList.add(item.priority); 
-    itemCard.innerHTML =    `
-                            <h4 class='item-title'>${item.title}</h3>
-                            <p class='item-due-date'>Due: ${item.dueDate}</p>
-                            <p class='item-priority'>Priority: ${item.priority}</p>
-                            `
+
+    removeItemBtn.addEventListener('click', () => {
+        removeItem(item);
+    });
+
+    itemTitle.textContent = item.title;
+    itemDueDate.textContent = `Due: ${item.dueDate}`;
+    itemPriority.textContent = `Priority: ${item.priority}`;
+    
 
     if(item.isComplete){
         itemCard.classList.add('item-card-complete')
     }
-    itemCard.appendChild(itemCompleteBtn);
+    
+    left.appendChild(itemCompleteBtn);
+    left.appendChild(itemContentContainer);
+    right.appendChild(removeItemBtn);
+    itemContentContainer.appendChild(itemTitle);
+    itemContentContainer.appendChild(itemDueDate);
+    itemContentContainer.appendChild(itemPriority);
+    itemCard.appendChild(left);
+    itemCard.appendChild(right);
+
     return itemCard;
 }
 
@@ -87,45 +123,73 @@ function createProject(title) {
 
 function createProjectCard(project) {
     const projectCard = document.createElement('div');
-    project.id = project.title;
-    projectCard.classList.add('project-card')
+    const projectCardHeader = document.createElement('div');
+    const btnContainer = document.createElement('div');
+    const itemCardContainer = document.createElement('div');
+
+    projectCard.id = `project-${project.title}`;
+    projectCard.classList.add('project-card');
+    projectCardHeader.classList.add('project-card-header')
+    btnContainer.classList.add('project-card-btn-container');
+    itemCardContainer.classList.add('project-item-card-container');
 
     const projectCardTitle = document.createElement('h1');
     projectCardTitle.classList.add('project-card-title');
     projectCardTitle.textContent = `${project.title}`;
 
-    const delBtn = document.createElement('div');
-    delBtn.classList.add('delete-project-btn');
-    delBtn.innerText = 'x';
-    delBtn.addEventListener('click', (e) => {
-        // could be its own removeProject function
-        const indexToRemove = (_projects.findIndex((proj) => proj.title == getProject(project.title).title));
-        _projects.splice(indexToRemove, 1);
-        updatePage();
+    const completeBtn = document.createElement('button');
+    completeBtn.classList.add('complete-project-button');
+    completeBtn.innerText = 'O';
+    completeBtn.addEventListener('click', () => {
+        completeProject(project);
     })
 
-    projectCard.appendChild(delBtn);
-    projectCard.appendChild(projectCardTitle);
+    const delBtn = document.createElement('button');
+    delBtn.classList.add('delete-project-btn');
+    delBtn.innerText = 'X';
+    delBtn.addEventListener('click', (e) => {
+        // could be its own removeProject function
+        removeProject(project);
+        updatePage();
+    })
+   
+
+    btnContainer.appendChild(completeBtn);
+    btnContainer.appendChild(delBtn);
+    projectCardHeader.appendChild(projectCardTitle);
+    projectCardHeader.appendChild(btnContainer);
+    projectCard.appendChild(projectCardHeader);
 
     for(let item of project.items){
-        projectCard.appendChild(createItemCard(item));
+        itemCardContainer.appendChild(createItemCard(item));
     }
     for(let item of project.completedItems){
-        projectCard.appendChild(createItemCard(item));
+        itemCardContainer.appendChild(createItemCard(item));
     }
+    projectCard.appendChild(itemCardContainer);
     
     return projectCard;
 }
 
-function completeProject(project) {
-    return project.isComplete = true;
+function completeProject(projectToComplete) {
+    if(projectToComplete.isComplete){
+        return console.log('Project is already complete')
+    } else {
+        projectToComplete.isComplete = true;
+        for(let item of projectToComplete.items){
+            completeItem(item);
+        }
+        _completedProjects.unshift(projectToComplete);
+        _projects = _projects.filter((proj) => proj.title !== projectToComplete.title);
+
+        updatePage();
+    }
 }
 
 function completeItem(itemToComplete) {
     const project = getProject(itemToComplete.project);
     const indexOfItem = project.items.findIndex(item => item.title === itemToComplete.title);
-    console.log('~~~~~~')
-    console.log(project.items[indexOfItem])
+
     itemToComplete.isComplete = true;
 
     // moves item from project.items to beginning of project.completedItems
@@ -134,22 +198,6 @@ function completeItem(itemToComplete) {
     
     updatePage();
 }
-
-
-// function sendCompletedToBack() {
-//     // Sends all completed tasks of all projects to end of their lists
-//     for(let project of _projects) {
-//         for(let j = 0; j < project.items.length; j++){
-//             if(project.items[j].isComplete) {
-//                 project.items.push(project.items.splice(j, 1)[0])
-//                 console.log(project.items)
-//             }
-//         }
-
-     
-//     }
-
-// }
 
 function createAppNav() {
     const addItemModal = document.getElementById('add-item-modal');
@@ -223,6 +271,7 @@ function updateDropdown() {
 function createAddProjectModal() {
     const addProjectModal = document.createElement('div');
     addProjectModal.classList.add('closed');
+    addProjectModal.classList.add('modal');
     addProjectModal.id = 'add-project-modal';
 
     const addProjectForm = document.createElement('form');
@@ -254,6 +303,7 @@ function createAddProjectModal() {
 function createAddItemModal() {
     const addItemModal    = document.createElement('div');
     addItemModal.classList.add('closed');
+    addItemModal.classList.add('modal');
     addItemModal.id       = 'add-item-modal';
 
     const addItemForm = document.createElement('form');
@@ -303,14 +353,6 @@ function createAddItemModal() {
     dropdownPriority.appendChild(lowPriority)
     dropdownPriority.appendChild(mediumPriority)
     dropdownPriority.appendChild(highPriority)
-
-    // const itemPriorityLabel     = document.createElement('label');
-    // itemPriorityLabel.id = 'itemPriority'
-    // itemPriorityLabel.innerText = 'Priority:'
-    // const itemPriorityInput     = document.createElement('input');
-    // itemPriorityInput.type      = 'text';
-    // itemPriorityInput.id        = 'new-item-priority';
-    // itemPriorityInput.name      = 'itemPriority';
     
     const submitBtn = document.createElement('button');
     submitBtn.type = 'submit';
@@ -325,8 +367,6 @@ function createAddItemModal() {
     addItemForm.appendChild(itemDueDateInput);
     addItemForm.appendChild(dropdownPriorityLabel)
     addItemForm.appendChild(dropdownPriority);
-    // addItemForm.appendChild(itemPriorityLabel);
-    // addItemForm.appendChild(itemPriorityInput);
     addItemForm.appendChild(submitBtn);
 
 
@@ -337,6 +377,7 @@ function createAddItemModal() {
 }
 
 function openAddProjectModal() {
+    closeAllModals();
     const addProjectModal = document.getElementById('add-project-modal');
     const addProjectForm = document.getElementById('add-project-form');
     addProjectForm.reset();
@@ -353,6 +394,7 @@ function closeAddProjectModal() {
 }
 
 function openAddItemModal() {
+    closeAllModals();
     const addItemModal = document.getElementById('add-item-modal');
     const addItemForm = document.getElementById('add-item-form');
     addItemForm.reset();
@@ -368,6 +410,23 @@ function closeAddItemModal() {
     addItemModal.classList.add('closed');
 }
 
+function closeAllModals() {
+    const addItemModal = document.getElementById('add-item-modal');
+    const addProjectModal = document.getElementById('add-project-modal');
+    addItemModal.classList.remove('opened')
+    addProjectModal.classList.remove('opened')
+    addItemModal.classList.add('closed')
+    addProjectModal.classList.add('closed')
+}
+
+function resetForms() {
+    const addItemForm = document.getElementById('add-item-form');
+    const addProjectForm = document.getElementById('add-project-form');
+
+    addItemForm.reset();
+    addProjectForm.reset();
+}
+
 function processProjectFormData() {
     const title = document.getElementById('project-title-input').value;
     return createProject(title)
@@ -376,6 +435,11 @@ function processProjectFormData() {
 function processItemFormData() {
     const title    = document.getElementById('new-item-title').value
     const dueDate  = document.getElementById('new-item-duedate').value
+    console.log('Formatting date: ')
+    console.log(getDay(dueDate));
+    console.log(typeof dueDate)
+
+
     const priority = document.getElementById('selectPriority').value
     const project  = document.getElementById('selectProject').value
 
@@ -401,24 +465,65 @@ function addItem(e) {
     const project = getProject(newItem.project);
     let indexOfProject = _projects.findIndex((project) => project.title == newItem.project);
     _projects[indexOfProject].items.push(newItem);
-
+    resetForms();
     updatePage();
 
-    closeAddItemModal();
+    // closeAddItemModal();
+}
+
+function removeProject(projectToRemove) {
+    if(projectToRemove.isComplete) {
+        console.log('Removing completed project')
+        _completedProjects = _completedProjects.filter(proj => proj.title !== projectToRemove.title)
+    } else {
+        _projects = _projects.filter(proj => proj.title !== projectToRemove.title)
+    }
+}
+
+function removeItem(itemToRemove) {
+    const project = getProject(itemToRemove.project);
+    console.log('project is: ' + project)
+    if(itemToRemove.isComplete){
+        console.log('Removing completed task')
+        project.completedItems = project.completedItems.filter((item) => item.title !== itemToRemove.title);
+    } else {
+        project.items = project.items.filter((item) => item.title !== itemToRemove.title);
+    }
+    updatePage();
 }
 
 function getProject(title) {
-    return _projects.find((project) => project.title === title)
+    let project = _projects.find((project) => project.title === title);
+    if(!project){
+        project = _completedProjects.find((project) => project.title === title);
+        return project;
+    }
+    return project;
 }
 
 function renderProjectCards() {
     const main = document.getElementById('main');
     main.innerHTML = '';
-    let projects = _projects;
-
-    for(let i = 0; i < projects.length; i++) {
-        let projectCard = createProjectCard(projects[i]);
+    // let projects = _projects;
+    // let completedProjects = _completedProjects;
+    if(_projects === null){
+        _projects = [];
+    }
+    for(let project of _projects){
+        let projectCard = createProjectCard(project);
+        projectCard.classList.add('project');
         main.appendChild(projectCard);
+    }
+    // for(let i = 0; i < projects.length; i++) {
+    //     let projectCard = createProjectCard(projects[i]);
+    //     main.appendChild(projectCard);
+    // }
+    if(_completedProjects){
+        for(let project of _completedProjects){
+            let projectCard = createProjectCard(project);
+            projectCard.classList.add('completed-project')
+            main.appendChild(projectCard);
+        }
     }
     updateDropdown();
     console.log('Project cards rendered')
@@ -471,7 +576,7 @@ function initTodoApp() {
     const header = document.getElementById('header')
     header.appendChild(createAppNav());
     console.log('date date')
-    // console.log(isAfter(new Date(1995, 11, 17), new Date(1997, 10, 5)))
+    console.log(isAfter(new Date(1995, 11, 17), new Date(1997, 10, 5)))
     restoreLocal();
 }
 
@@ -483,28 +588,26 @@ const updatePage = () => {
 
 const saveLocal = () => {
     localStorage.setItem('savedProjects', JSON.stringify(_projects))
+    localStorage.setItem('savedCompletedProjects', JSON.stringify(_completedProjects))
     console.log('saved local')
 }
 
 const restoreLocal = () => {
     const projects = JSON.parse(localStorage.getItem('savedProjects'))
+    const completedProjects = JSON.parse(localStorage.getItem('savedCompletedProjects'))
+    _projects = projects;
+    _completedProjects = completedProjects;
 
-    if(projects === null) {
-        console.log('null boy')
-        // _projects = [createProject('Default')]
-        updatePage();
-        return
+    if(_projects === null || _completedProjects === null) {
+        if(_projects === null){
+            _projects = []
+        } 
+        if(_completedProjects === null){
+            _completedProjects = []
+        }
     }
-    if (projects.length > 0) {
-        console.log('local restored!')
-        _projects = projects;
-        console.log('_projects: ' + _projects)
-        updatePage(); 
-    } else {
-        console.log('_projects is empty. initializing....')
-        // _projects = [createProject('Default')];
-        updatePage();
-    }
+    updatePage();
+    
 }
 
 export default initTodoApp;
