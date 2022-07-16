@@ -220,10 +220,10 @@ function createAppNav() {
     addItemBtn.classList.add('add-item-btn');
     addItemBtn.innerHTML = 'Add task';
     addItemBtn.addEventListener('click', () => {
-        // if(_projects.some(proj => !(proj.isComplete)) || _projects == null){
-        //     console.log('_projects is empty or null')
-        //     return false;
-        // }
+        if(_projects.every(proj => (proj.isComplete)) || _projects == null){
+            console.log('_projects is empty or null')
+            return false;
+        }
         if(addItemModal.classList.contains('opened')) {
             return false;
         } else {        
