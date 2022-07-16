@@ -56,6 +56,9 @@ input {
     width: 450px;
     padding: 10px;
     margin: 15px;
+    /* box-shadow: -4px 4px black;
+    border: 1px solid black;
+    border-radius: 50px; */
     
 }
 
@@ -131,6 +134,7 @@ input {
 
 .item-card-complete {
     opacity: 15%;
+    text-decoration: line-through;
 }
 
 
@@ -151,7 +155,7 @@ input {
 
 #main {
     display: flex;
-    flex-wrap: wrap;
+    flex-direction: column;
     padding: 25px;
     height: 100%;
 }

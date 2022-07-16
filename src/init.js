@@ -15,6 +15,11 @@
 // Close buttons on project modal
 // Add 'number of days until due'
 // Disable 'add task' button when there's no projects
+// New project not going to front when there's multiple completed projects
+// Organize all tasks by date, include project in this case
+// Gray out add task button, or allow users to create a project within the task modal?
+// Remove task button does not work on completed tasks
+// Make item cards sleeker
 
 import {isAfter, format, getDay, parseISO} from 'date-fns';
 
