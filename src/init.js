@@ -4,22 +4,19 @@
 // front end
 // In progress & complete project columns
 // Undo completed tasks (Complete button currently just copies itself)
-// New tasks should come after one another, but always before completed tasks 
-//      - 2 separate attributes/ this.tasks, this.completeTask
-            // however this is needlessly more complicated?
 // Preference to send completed tasks to beginning or end or list
 // Form validation
 // View all tasks (sort by urgency) (no project)
-// Sort tasks per project
-// add more divs(containers) for formatting
 // drag n drop
 // buttons dont work on completed projects
 // close all modals when one is clicked to open
 // sidebar (App, Stats)
-// Footer can have switches
-// Default landing (Projeecst go here! dotted box)
+// Footer can have switches (mode, sorting, etc)
+// Close buttons on project modal
+// Add 'number of days until due'
+// Disable 'add task' button when there's no projects
 
-import {isAfter, format, getDay} from 'date-fns';
+import {isAfter, format, getDay, parseISO} from 'date-fns';
 
 class Item {
     constructor(title, dueDate, priority, project) {
@@ -53,7 +50,7 @@ class Project {
 }
 
 let _projects = [];
-let _completedProjects = [];
+// let _completedProjects = [];
 
 function createItem(title, dueDate, priority, project) {
     return new Item(title, dueDate, priority, project)
@@ -71,6 +68,9 @@ function createItemCard(item) {
     const removeItemBtn = document.createElement('div');
 
     itemCard.classList.add('item-card')
+    if(item.priority === 'Critical'){
+        itemCard.classList.add('item-critical')
+    }
     left.classList.add('item-card-left') 
     itemContentContainer.classList.add('item-card-content');
     itemTitle.classList.add('item-title');
@@ -129,10 +129,19 @@ function createProjectCard(project) {
 
     projectCard.id = `project-${project.title}`;
     projectCard.classList.add('project-card');
+    if(project.isComplete){
+        projectCard.classList.add('project-card-complete')
+    }
     projectCardHeader.classList.add('project-card-header')
     btnContainer.classList.add('project-card-btn-container');
     itemCardContainer.classList.add('project-item-card-container');
 
+    const addItemBtn = document.createElement('button');
+    addItemBtn.classList.add('project-card-add-item-btn');
+    addItemBtn.textContent = '+';
+    addItemBtn.addEventListener('click', () => {
+        openAddItemModal();
+    })
     const projectCardTitle = document.createElement('h1');
     projectCardTitle.classList.add('project-card-title');
     projectCardTitle.textContent = `${project.title}`;
@@ -157,6 +166,7 @@ function createProjectCard(project) {
     btnContainer.appendChild(completeBtn);
     btnContainer.appendChild(delBtn);
     projectCardHeader.appendChild(projectCardTitle);
+    // projectCardHeader.appendChild(addItemBtn)
     projectCardHeader.appendChild(btnContainer);
     projectCard.appendChild(projectCardHeader);
 
@@ -179,23 +189,12 @@ function completeProject(projectToComplete) {
         for(let item of projectToComplete.items){
             completeItem(item);
         }
-        _completedProjects.unshift(projectToComplete);
-        _projects = _projects.filter((proj) => proj.title !== projectToComplete.title);
-
         updatePage();
     }
 }
 
 function completeItem(itemToComplete) {
-    const project = getProject(itemToComplete.project);
-    const indexOfItem = project.items.findIndex(item => item.title === itemToComplete.title);
-
-    itemToComplete.isComplete = true;
-
-    // moves item from project.items to beginning of project.completedItems
-    project.completedItems.unshift(itemToComplete)
-    project.items.splice(indexOfItem, 1)
-    
+    itemToComplete.isComplete = true;    
     updatePage();
 }
 
@@ -219,8 +218,12 @@ function createAppNav() {
     })
 
     addItemBtn.classList.add('add-item-btn');
-    addItemBtn.innerHTML = 'Add todo';
+    addItemBtn.innerHTML = 'Add task';
     addItemBtn.addEventListener('click', () => {
+        // if(_projects.some(proj => !(proj.isComplete)) || _projects == null){
+        //     console.log('_projects is empty or null')
+        //     return false;
+        // }
         if(addItemModal.classList.contains('opened')) {
             return false;
         } else {        
@@ -261,10 +264,12 @@ function updateDropdown() {
     const dropdown = document.getElementById('selectProject');
     dropdown.innerHTML = '';
     _projects.map((project) => {
-        const option = document.createElement('option');
-        option.value = project.title;
-        option.innerText = project.title;
-        dropdown.appendChild(option);
+        if(!project.isComplete){
+            const option = document.createElement('option');
+            option.value = project.title;
+            option.innerText = project.title;
+            dropdown.appendChild(option);
+        }
     })
 }
 
@@ -279,7 +284,7 @@ function createAddProjectModal() {
 
     const projectTitleLabel = document.createElement('label');
     projectTitleLabel.id = 'new-project-title'
-    projectTitleLabel.innerText = 'Project title: '
+    projectTitleLabel.innerText = 'Title:'
 
     const projectTitleInput = document.createElement('input');
     projectTitleInput.type = 'text';
@@ -306,10 +311,21 @@ function createAddItemModal() {
     addItemModal.classList.add('modal');
     addItemModal.id       = 'add-item-modal';
 
+    const modalLabel = document.createElement('h3');
+    modalLabel.classList.add('modal-label');
+    modalLabel.id = 'item-modal-label';
+    modalLabel.textContent = 'New task';
+
+    const closeModalBtn = document.createElement('div');
+    closeModalBtn.classList.add('modal-close-btn');
+    closeModalBtn.addEventListener('click', closeAddItemModal);
+
     const addItemForm = document.createElement('form');
     addItemForm.id    = 'add-item-form';
 
     const dropdownProjects = document.createElement('select');
+    const dropdownProjectsLabel = document.createElement('label');
+    dropdownProjectsLabel.innerText = 'Project: '
     dropdownProjects.id = 'selectProject';
     for(let i=0; i<_projects.length; i++) {
         let project = _projects[i];
@@ -349,17 +365,21 @@ function createAddItemModal() {
     const highPriority = document.createElement('option');
     highPriority.value = 'High';
     highPriority.innerText = 'High';
+    const critPriority = document.createElement('option');
+    critPriority.value = 'Critical';
+    critPriority.innerText = 'Critical';
 
     dropdownPriority.appendChild(lowPriority)
     dropdownPriority.appendChild(mediumPriority)
     dropdownPriority.appendChild(highPriority)
+    dropdownPriority.appendChild(critPriority)
     
     const submitBtn = document.createElement('button');
     submitBtn.type = 'submit';
     submitBtn.id = 'item-modal-submit-btn'
     submitBtn.innerText = 'Submit'
 
-
+    addItemForm.appendChild(dropdownProjectsLabel)
     addItemForm.appendChild(dropdownProjects);
     addItemForm.appendChild(itemTitleLabel);
     addItemForm.appendChild(itemTitleInput);
@@ -371,6 +391,8 @@ function createAddItemModal() {
 
 
     addItemForm.onsubmit = addItem;
+    addItemModal.appendChild(modalLabel)
+    addItemModal.appendChild(closeModalBtn)
     addItemModal.appendChild(addItemForm);
     
     return addItemModal;
@@ -434,12 +456,10 @@ function processProjectFormData() {
 
 function processItemFormData() {
     const title    = document.getElementById('new-item-title').value
-    const dueDate  = document.getElementById('new-item-duedate').value
-    console.log('Formatting date: ')
-    console.log(getDay(dueDate));
-    console.log(typeof dueDate)
-
-
+    let dueDate  = document.getElementById('new-item-duedate').value
+    if(dueDate){
+        dueDate = format(parseISO(dueDate), ('eee, ' + 'MMM ' + 'dd, ' + 'yyyy'));
+    }
     const priority = document.getElementById('selectPriority').value
     const project  = document.getElementById('selectProject').value
 
@@ -472,12 +492,7 @@ function addItem(e) {
 }
 
 function removeProject(projectToRemove) {
-    if(projectToRemove.isComplete) {
-        console.log('Removing completed project')
-        _completedProjects = _completedProjects.filter(proj => proj.title !== projectToRemove.title)
-    } else {
-        _projects = _projects.filter(proj => proj.title !== projectToRemove.title)
-    }
+    _projects = _projects.filter(proj => proj.title !== projectToRemove.title)   
 }
 
 function removeItem(itemToRemove) {
@@ -489,16 +504,35 @@ function removeItem(itemToRemove) {
     } else {
         project.items = project.items.filter((item) => item.title !== itemToRemove.title);
     }
+    
     updatePage();
 }
 
 function getProject(title) {
-    let project = _projects.find((project) => project.title === title);
-    if(!project){
-        project = _completedProjects.find((project) => project.title === title);
-        return project;
+    return _projects.find((project) => project.title === title);
+}
+
+function sortItems() {
+    for(let project of _projects){
+        for(let item of project.items){
+            if(item.priority == 'Critical'){
+                const indexOfItem = project.items.findIndex((task) => task.title === item.title);
+                project.items.unshift(project.items.splice(indexOfItem, 1)[0]);
+            }
+            if(item.isComplete){
+                const indexOfItem = project.items.findIndex((task) => task.title === item.title);
+                project.items.push(project.items.splice(indexOfItem, 1)[0])
+            }
+        }
     }
-    return project;
+}
+
+function sortProjects() {
+    for(let i = 0; i < _projects.length; i++){
+        if(_projects[i].isComplete){
+            _projects.push(_projects.splice(i, 1)[0])
+        }
+    }
 }
 
 function renderProjectCards() {
@@ -509,22 +543,24 @@ function renderProjectCards() {
     if(_projects === null){
         _projects = [];
     }
+
+    if(_projects.length == 0){
+        const placeholder = document.createElement('div');
+        placeholder.classList.add('projects-placeholder')
+        const placeholderText = document.createElement('p');
+        placeholderText.classList.add('projects-placeholder-text')
+        placeholderText.innerHTML = `<p>Your projects will go here!</p>
+                                     <p>Click <b>"Add project"</b> to get started.</p>'`
+        placeholder.appendChild(placeholderText);
+        main.appendChild(placeholder);
+    }
+
     for(let project of _projects){
-        let projectCard = createProjectCard(project);
-        projectCard.classList.add('project');
+        let projectCard = createProjectCard(project);        
         main.appendChild(projectCard);
     }
-    // for(let i = 0; i < projects.length; i++) {
-    //     let projectCard = createProjectCard(projects[i]);
-    //     main.appendChild(projectCard);
-    // }
-    if(_completedProjects){
-        for(let project of _completedProjects){
-            let projectCard = createProjectCard(project);
-            projectCard.classList.add('completed-project')
-            main.appendChild(projectCard);
-        }
-    }
+ 
+
     updateDropdown();
     console.log('Project cards rendered')
 }
@@ -551,6 +587,7 @@ function createMain() {
     const main = document.createElement('main');
     main.classList.add('main');
     main.id = 'main';
+    main.addEventListener('click', closeAllModals);
 
     return main;
 }
@@ -582,29 +619,25 @@ function initTodoApp() {
 
 const updatePage = () => {
     saveLocal();
+    sortProjects();
+    sortItems();
+
     resetPage();
     renderProjectCards();
 }
 
 const saveLocal = () => {
     localStorage.setItem('savedProjects', JSON.stringify(_projects))
-    localStorage.setItem('savedCompletedProjects', JSON.stringify(_completedProjects))
     console.log('saved local')
 }
 
 const restoreLocal = () => {
     const projects = JSON.parse(localStorage.getItem('savedProjects'))
     const completedProjects = JSON.parse(localStorage.getItem('savedCompletedProjects'))
-    _projects = projects;
-    _completedProjects = completedProjects;
-
-    if(_projects === null || _completedProjects === null) {
-        if(_projects === null){
-            _projects = []
-        } 
-        if(_completedProjects === null){
-            _completedProjects = []
-        }
+    if(projects){
+        _projects = projects;
+    } else {
+        _projects = [];
     }
     updatePage();
     
