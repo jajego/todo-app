@@ -11,16 +11,8 @@ html, body {
 
 #add-item-modal, 
 #add-project-modal {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    height: auto;
-    width: 350px;
-    padding: 15px;
-    background-color: white;
-    border: 2px solid rgb(177, 177, 177);
-    border-radius: 25px;
+    display: none;
+    padding: 10px;
 }
 
 #content {
@@ -50,7 +42,7 @@ html, body {
     text-align: left;
 }
 
-.active, .collapsible:hover {
+.sidebar-menu-active, .collapsible:hover {
     background-color: #ccc;
 }
 
@@ -100,19 +92,14 @@ input {
     display: flex;
     justify-content: space-between;
     padding: 5px;
-    margin-bottom: 10px;
+    margin-bottom: 5px;
 }
 
 .project-card-title {
     /* width: 70%; */
 }
 
-.card-header-left {
-    display: flex;
-    justify-content: left;
-    width: 50%;
-    height: 50px;
-}
+
 
 .project-card-btn-container {
     display: flex;
@@ -133,13 +120,21 @@ input {
     width: 75%;
 }
 
+.project-card-add-item-btn {
+    font-size: 2.5rem;
+    color: lightgray;
+    cursor: pointer;
+}
+
+.project-card-add-item-btn:hover {
+    background-color: rgb(228, 228, 228);
+}
 
 
 .item-card {
     display: flex;
     justify-content: space-between;
     background-color: white;
-    padding: 15px;
     margin-bottom: 15px;
     /* border: 1px dotted rosybrown; */
     border-radius: 15px;
@@ -239,14 +234,6 @@ input {
     right: 10px;
 }
 
-.opened {
-    display: block;
-}
-
-.closed {
-    display: none;
-}
-
 .clear-local-storage-btn {
     background-color: rebeccapurple;
     color: white;
@@ -318,3 +305,6 @@ button {
     margin-left: 90%;
 }
 
+.no-display {
+    display: none;
+}

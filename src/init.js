@@ -11,17 +11,21 @@
 // Footer can have switches (mode, sorting, etc)
 // Close buttons on project modal
 // Add 'number of days until due'
-// Disable 'add task' button when there's no projects
-// New project not going to front when there's multiple completed projects
 // Organize all tasks by date, include project in this case
-// Gray out add task button, or allow users to create a project within the task modal?
 // Remove task button does not work on completed tasks
 // Make item cards sleeker
 // Stats sidebar
 // Add task button not currently working on addproject button
-// convert opened/closed classes to single js/css active toggle
+// Edit task
+// double-click project name to rename
+// 
+
+// IDEAS
+// Arrows pointing to certain tasks from the right - Alert! This task is due in 2 days! etc
+// Be able to tag projects by color
 
 import {isAfter, format, getDay, parseISO} from 'date-fns';
+import { fi } from 'date-fns/locale';
 
 class Item {
     constructor(title, dueDate, priority, project) {
@@ -55,6 +59,7 @@ class Project {
 }
 
 let _projects = [];
+let _lastOpenedProject;
 // let _completedProjects = [];
 
 function createItem(title, dueDate, priority, project) {
@@ -119,35 +124,43 @@ function createItemCard(item) {
 
 function createProject(title) {
     let project = new Project(title);
-    // let defaultItem = createItem('Default', 'This is a default task', 'Tomorrow', 'Soon', title)
-    // project.items.push(defaultItem)
-    updatePage();
     
     return project;
 }
 
 function createProjectCard(project) {
     const projectCard = document.createElement('div');
-    const cardHeaderLeft = document.createElement('div');
     const projectCardHeader = document.createElement('div');
     const addItemBtn = document.createElement('div');
     const btnContainer = document.createElement('div');
     const itemCardContainer = document.createElement('div');
-
+    const itemModal = createAddItemModal2();
+    // if(!project){
+    //     project = createProject('Default');
+    // }
+    console.log(`Project is ${project}`)
     projectCard.id = `project-${project.title}`;
     projectCard.classList.add('project-card');
     if(project.isComplete){
         projectCard.classList.add('project-card-complete')
     }
 
-    cardHeaderLeft.classList.add('card-header-left')
     projectCardHeader.classList.add('project-card-header')
     btnContainer.classList.add('project-card-btn-container');
     itemCardContainer.classList.add('project-item-card-container');
 
     addItemBtn.classList.add('project-card-add-item-btn');
     addItemBtn.textContent = '+';
-    addItemBtn.addEventListener('click', openAddItemModal);
+    addItemBtn.addEventListener('click', () => {
+        const addItemModal = document.getElementById('add-item-modal');
+        addItemModal.classList.toggle('modal-active');
+        if(addItemModal.style.display === 'block'){
+            addItemModal.style.display = 'none';
+        } else {
+            addItemModal.style.display = 'block';
+        }
+    })
+    // addItemBtn.addEventListener('click', openAddItemModal);
     const projectCardTitle = document.createElement('h1');
     projectCardTitle.classList.add('project-card-title');
     projectCardTitle.textContent = `${project.title}`;
@@ -168,13 +181,14 @@ function createProjectCard(project) {
         updatePage();
     })
    
-    cardHeaderLeft.appendChild(projectCardTitle);
-    cardHeaderLeft.appendChild(addItemBtn);
+    projectCardHeader.appendChild(projectCardTitle);
     btnContainer.appendChild(completeBtn);
     btnContainer.appendChild(delBtn);
-    projectCardHeader.appendChild(cardHeaderLeft);
     projectCardHeader.appendChild(btnContainer);
     projectCard.appendChild(projectCardHeader);
+    projectCard.appendChild(addItemBtn);
+    projectCard.appendChild(itemModal);
+
 
     for(let item of project.items){
         itemCardContainer.appendChild(createItemCard(item));
@@ -216,24 +230,22 @@ function createAppNav() {
     addProjectBtn.classList.add('add-project-btn');
     addProjectBtn.innerHTML = 'Add project';
     addProjectBtn.addEventListener('click', () => {
-        if(addProjectModal.classList.contains('opened')) {
-            return false;
-        } else {        
-            openAddProjectModal();
+        addProjectModal.classList.toggle('modal-active');
+        if(addProjectModal.style.display === 'block') {
+            addProjectModal.style.display = 'none';
+        } else {
+            addProjectModal.style.display = 'block';
         }
     })
 
     addItemBtn.classList.add('add-item-btn');
     addItemBtn.innerHTML = 'Add task';
     addItemBtn.addEventListener('click', () => {
-        if(_projects.every(proj => (proj.isComplete)) || _projects == null){
-            console.log('_projects is empty or null')
-            return false;
-        }
-        if(addItemModal.classList.contains('opened')) {
-            return false;
-        } else {        
-            openAddItemModal();
+        addItemModal.classList.toggle('modal-active');
+        if(addItemModal.style.display === 'block') {
+            addItemModal.style.display = 'none';
+        } else {
+            addItemModal.style.display = 'block';
         }
     })
 
@@ -254,7 +266,7 @@ function createAppNav() {
     })
     
     projectCardNav.appendChild(addProjectBtn);
-    projectCardNav.appendChild(addItemBtn);
+    // projectCardNav.appendChild(addItemBtn);
     // projectCardNav.appendChild(editProjectTitleBtn);
     projectCardNav.appendChild(clearLocalStorageBtn)
 
@@ -281,7 +293,6 @@ function updateDropdown() {
 
 function createAddProjectModal() {
     const addProjectModal = document.createElement('div');
-    addProjectModal.classList.add('closed');
     addProjectModal.classList.add('modal');
     addProjectModal.id = 'add-project-modal';
 
@@ -311,9 +322,76 @@ function createAddProjectModal() {
     return addProjectModal;
 }
 
+function createAddItemModal2() {
+    const addItemModal = document.createElement('div');
+    addItemModal.classList.add('modal');
+    addItemModal.id       = 'add-item-modal';
+
+    const addItemForm = document.createElement('form');
+    addItemForm.id = 'add-item-form';
+
+    // const project = e.target.parentNode.id;
+   
+    const itemTitleInput     = document.createElement('input');
+    itemTitleInput.type      = 'text';
+    itemTitleInput.id        = 'new-item-title';
+    itemTitleInput.name      = 'itemTitle';
+    itemTitleInput.placeholderText = 'To do'
+
+    const itemDueDateInput     = document.createElement('input');
+    itemDueDateInput.type      = 'date';
+    itemDueDateInput.id        = 'new-item-duedate';
+    itemDueDateInput.name      = 'itemDueDate';
+
+    const dropdownPriority = document.createElement('select');
+    dropdownPriority.id = 'selectPriority';
+    const lowPriority = document.createElement('option');
+    lowPriority.value = 'Low';
+    lowPriority.innerText = 'Low';
+    const mediumPriority = document.createElement('option');
+    mediumPriority.value = 'Medium';
+    mediumPriority.innerText = 'Medium';
+    const highPriority = document.createElement('option');
+    highPriority.value = 'High';
+    highPriority.innerText = 'High';
+    const critPriority = document.createElement('option');
+    critPriority.value = 'Critical';
+    critPriority.innerText = 'Critical';
+
+    dropdownPriority.appendChild(lowPriority)
+    dropdownPriority.appendChild(mediumPriority)
+    dropdownPriority.appendChild(highPriority)
+    dropdownPriority.appendChild(critPriority)
+    
+    const submitBtn = document.createElement('button');
+    submitBtn.type = 'submit';
+    submitBtn.id = 'item-modal-submit-btn'
+    submitBtn.innerText = 'Submit'
+    submitBtn.addEventListener('click', console.log(submitBtn.parentNode))
+
+    const project = document.createElement('input');
+    project.type = 'text';
+    project.id = 'selectProject';
+    project.classList.add('no-display');
+    project.value = _lastOpenedProject;
+
+    addItemForm.appendChild(project);
+    addItemForm.appendChild(itemTitleInput);
+    addItemForm.appendChild(itemDueDateInput);
+    addItemForm.appendChild(itemDueDateInput);
+    addItemForm.appendChild(dropdownPriority)
+    addItemForm.appendChild(submitBtn);
+
+    addItemForm.onsubmit = addItem;
+    addItemModal.appendChild(addItemForm);
+    
+    return addItemModal;
+}
+
+// process item form 2
+
 function createAddItemModal() {
     const addItemModal    = document.createElement('div');
-    addItemModal.classList.add('closed');
     addItemModal.classList.add('modal');
     addItemModal.id       = 'add-item-modal';
 
@@ -324,7 +402,7 @@ function createAddItemModal() {
 
     const closeModalBtn = document.createElement('div');
     closeModalBtn.classList.add('modal-close-btn');
-    closeModalBtn.addEventListener('click', closeAddItemModal);
+    // closeModalBtn.addEventListener('click', closeAddItemModal);
 
     const addItemForm = document.createElement('form');
     addItemForm.id    = 'add-item-form';
@@ -404,39 +482,7 @@ function createAddItemModal() {
     return addItemModal;
 }
 
-function openAddProjectModal() {
-    closeAllModals();
-    const addProjectModal = document.getElementById('add-project-modal');
-    const addProjectForm = document.getElementById('add-project-form');
-    addProjectForm.reset();
-    addProjectModal.classList.remove('closed');
-    addProjectModal.classList.add('opened');
-}
 
-function closeAddProjectModal() {
-    const addProjectModal = document.getElementById('add-project-modal');
-    const addProjectForm = document.getElementById('add-project-form');
-    addProjectForm.reset();
-    addProjectModal.classList.remove('opened');
-    addProjectModal.classList.add('closed');
-}
-
-function openAddItemModal() {
-    closeAllModals();
-    const addItemModal = document.getElementById('add-item-modal');
-    const addItemForm = document.getElementById('add-item-form');
-    addItemForm.reset();
-    addItemModal.classList.remove('closed');
-    addItemModal.classList.add('opened');
-}
-
-function closeAddItemModal() {
-    const addItemModal = document.getElementById('add-item-modal');
-    const addItemForm = document.getElementById('add-item-form');
-    addItemForm.reset();
-    addItemModal.classList.remove('opened');
-    addItemModal.classList.add('closed');
-}
 
 function closeAllModals() {
     const addItemModal = document.getElementById('add-item-modal');
@@ -478,10 +524,9 @@ function addProject(e) {
     const newProject = processProjectFormData();
     console.log('Successfully processed project form data')
     _projects.push(newProject);
-
+    _lastOpenedProject = newProject.title;
     updatePage();
 
-    closeAddProjectModal();
 }
 
 function addItem(e) {
@@ -510,7 +555,7 @@ function removeItem(itemToRemove) {
     } else {
         project.items = project.items.filter((item) => item.title !== itemToRemove.title);
     }
-a}
+}
 
 function getProject(title) {
     return _projects.find((project) => project.title === title);
@@ -571,8 +616,17 @@ function renderProjectCards() {
 
 function renderProject(project) {
     resetPage();
+    // if(project === undefined){
+    //     project = createProject('Default');
+    // }
+    if(!project){
+        project = createProject('Default');
+        _projects.push(project);
+    }
     const main = document.getElementById('main');
     main.appendChild(createProjectCard(project));
+    _lastOpenedProject = project.title;
+    saveLocal();
 }
 
 // base
@@ -605,7 +659,7 @@ function createSidebarMenus() {
     projectMenuTitle.classList.add('collapsible');
     projectMenuTitle.textContent = '📚Projects'
     projectMenuTitle.addEventListener('click', (e) => {
-        e.target.classList.toggle('active');
+        e.target.classList.toggle('sidebar-menu-active');
         console.log(e.target);
         const projects = e.target.nextElementSibling;
         if(projects.style.display === 'block') {
@@ -622,13 +676,13 @@ function createSidebarMenus() {
     projectMenu.id = 'sidebar-projects-dropdown';
    
     for(let project of _projects){
-        console.log('Im running@')
         const projOption = document.createElement('li');
         projOption.classList.add('sidebar-projects-dropdown-option');
         projOption.id = project.title;
         projOption.textContent = project.title;
         projOption.addEventListener('click', () => {
             renderProject(project);
+            // Add class that makes option bold when selected
         })
 
         projectMenu.appendChild(projOption);
@@ -641,7 +695,7 @@ function createSidebarMenus() {
     taskMenuTitle.classList.add('collapsible')
     taskMenuTitle.textContent = '☑️Tasks'
     taskMenuTitle.addEventListener('click', (e) => {
-        e.target.classList.toggle('active');
+        e.target.classList.toggle('sidebar-menu-active');
         console.log(e.target);
         const tasks = e.target.nextElementSibling;
         if(tasks.style.display === 'block') {
@@ -662,17 +716,17 @@ function createSidebarMenus() {
     const tasksDay = document.createElement('li');
     tasksDay.classList.add('sidebar-tasks-menu-card');
     tasksDay.id = 'sidebar-tasks-within-day';
-    tasksDay.innerHTML = `Within the <b>day</b>`
+    tasksDay.innerHTML = `Due within the <b>day</b>`
     const tasksWeek = document.createElement('li');
     tasksWeek.classList.add('sidebar-tasks-menu-card');
 
     tasksWeek.id = 'sidebar-tasks-within-week';
-    tasksWeek.innerHTML = `<p>Within the <b>week</b>`
+    tasksWeek.innerHTML = `<p>Due within the <b>week</b>`
     const tasksMonth = document.createElement('li');
     tasksMonth.classList.add('sidebar-tasks-menu-card');
 
     tasksMonth.id = `sidebar-tasks-within-month`;
-    tasksMonth.innerHTML = `<p>Within the <b>month</b>`
+    tasksMonth.innerHTML = `<p>Due within the <b>month</b>`
 
     taskMenu.appendChild(tasksAll);
     taskMenu.appendChild(tasksDay);
@@ -711,7 +765,6 @@ function createFooter() {
 function initTodoApp() {
 
     const header = document.body.appendChild(createHeader());
-    document.body.appendChild(createAddItemModal());
     document.body.appendChild(createAddProjectModal());
     header.appendChild(createAppNav());
 
@@ -744,24 +797,33 @@ const updatePage = () => {
     saveLocal();
     sortProjects();
     sortItems();
-    updateDropdown();
-    updateSidebarMenu();
+    
     resetPage();
+    renderProject(getProject(_lastOpenedProject))
+    // updateDropdown();
+    updateSidebarMenu();
     // renderProjectCards();
 }
 
 const saveLocal = () => {
     localStorage.setItem('savedProjects', JSON.stringify(_projects))
+    localStorage.setItem('lastOpenedProject', _lastOpenedProject)
     console.log('saved local')
 }
 
 const restoreLocal = () => {
     const projects = JSON.parse(localStorage.getItem('savedProjects'))
-    const completedProjects = JSON.parse(localStorage.getItem('savedCompletedProjects'))
+    const lastOpenedProject = localStorage.getItem('lastOpenedProject');
     if(projects){
         _projects = projects;
     } else {
         _projects = [];
+    }
+
+    if(lastOpenedProject){
+        _lastOpenedProject = lastOpenedProject;
+    } else {
+        _lastOpenedProject = undefined;
     }
     updatePage();
     
