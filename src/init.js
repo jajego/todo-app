@@ -565,8 +565,7 @@ function renderProjectCards() {
     }
  
 
-    updateDropdown();
-    updateSidebarMenu();
+    
     console.log('Project cards rendered')
 }
 
@@ -745,7 +744,8 @@ const updatePage = () => {
     saveLocal();
     sortProjects();
     sortItems();
-
+    updateDropdown();
+    updateSidebarMenu();
     resetPage();
     // renderProjectCards();
 }
