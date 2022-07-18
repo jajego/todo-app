@@ -18,11 +18,14 @@
 // Add task button not currently working on addproject button
 // Edit task
 // double-click project name to rename
-// 
+// Items being sent to wrong project sometimes, need to tweak _lastOpenedProject updates
+// Complete items sort every refresh lol
 
 // IDEAS
 // Arrows pointing to certain tasks from the right - Alert! This task is due in 2 days! etc
 // Be able to tag projects by color
+// Communicate priority by border around OR just color the circle differently
+// Color blind mode
 
 import {isAfter, format, getDay, parseISO} from 'date-fns';
 import { fi } from 'date-fns/locale';
@@ -60,7 +63,6 @@ class Project {
 
 let _projects = [];
 let _lastOpenedProject;
-// let _completedProjects = [];
 
 function createItem(title, dueDate, priority, project) {
     return new Item(title, dueDate, priority, project)
@@ -86,7 +88,7 @@ function createItemCard(item) {
     itemTitle.classList.add('item-title');
     itemDueDate.classList.add('item-due-date');
     itemPriority.classList.add('item-priority');
-    right.classList.add('item-card-btn-container')
+    right.classList.add('item-card-right')
     itemCompleteBtn.classList.add('item-card-btn');
     itemCompleteBtn.classList.add('item-complete-btn');
     removeItemBtn.classList.add('item-remove-btn');
@@ -96,6 +98,18 @@ function createItemCard(item) {
         completeItem(item)
         itemCard.classList.add('item-card-complete')
     })
+    if(item.priority === 'Low'){
+        itemCompleteBtn.classList.add('item-complete-btn-low')
+    }
+    if(item.priority === 'Medium'){
+        itemCompleteBtn.classList.add('item-complete-btn-medium')
+    }
+    if(item.priority === 'High'){
+        itemCompleteBtn.classList.add('item-complete-btn-high')
+    }
+    if(item.priority === 'Critical'){
+        itemCompleteBtn.classList.add('item-complete-btn-critical')
+    }
 
     removeItemBtn.addEventListener('click', () => {
         removeItem(item);
@@ -103,7 +117,7 @@ function createItemCard(item) {
 
     itemTitle.textContent = item.title;
     itemDueDate.textContent = `Due: ${item.dueDate}`;
-    itemPriority.textContent = `Priority: ${item.priority}`;
+    // itemPriority.textContent = `Priority: ${item.priority}`;
     
 
     if(item.isComplete){
@@ -112,10 +126,11 @@ function createItemCard(item) {
     
     left.appendChild(itemCompleteBtn);
     left.appendChild(itemContentContainer);
-    right.appendChild(removeItemBtn);
+    // right.appendChild(removeItemBtn);
+    right.appendChild(itemDueDate);
     itemContentContainer.appendChild(itemTitle);
-    itemContentContainer.appendChild(itemDueDate);
-    itemContentContainer.appendChild(itemPriority);
+    // itemContentContainer.appendChild(itemDueDate);
+    // itemContentContainer.appendChild(itemPriority);
     itemCard.appendChild(left);
     itemCard.appendChild(right);
 
@@ -150,6 +165,7 @@ function createProjectCard(project) {
     itemCardContainer.classList.add('project-item-card-container');
 
     addItemBtn.classList.add('project-card-add-item-btn');
+    addItemBtn.classList.add('add-item-btn-active');
     addItemBtn.textContent = '+';
     addItemBtn.addEventListener('click', () => {
         const addItemModal = document.getElementById('add-item-modal');
@@ -158,6 +174,12 @@ function createProjectCard(project) {
             addItemModal.style.display = 'none';
         } else {
             addItemModal.style.display = 'block';
+        }
+        addItemBtn.classList.toggle('add-item-btn-active');
+        if(addItemBtn.style.display === 'none'){
+            addItemBtn.style.display = 'block';
+        } else {
+            addItemBtn.style.display = 'none';
         }
     })
     // addItemBtn.addEventListener('click', openAddItemModal);
@@ -249,14 +271,6 @@ function createAppNav() {
         }
     })
 
-    const editProjectTitleBtn = document.createElement('button');
-    editProjectTitleBtn.classList.add('edit-project-title-btn');
-    editProjectTitleBtn.innerHTML = 'Change project title'
-    editProjectTitleBtn.addEventListener('click', () => {
-    // load project title change modal
-    // include double click option
-    })
-
     const clearLocalStorageBtn = document.createElement('button');
     clearLocalStorageBtn.classList.add('clear-local-storage-btn');
     clearLocalStorageBtn.innerHTML = 'Clear localStorage'
@@ -330,13 +344,20 @@ function createAddItemModal2() {
     const addItemForm = document.createElement('form');
     addItemForm.id = 'add-item-form';
 
+    const formTop = document.createElement('div');
+    formTop.id = 'add-item-form-top';
+    const formBottom = document.createElement('div');
+    formBottom.id = 'add-item-form-bottom';
+
+
+
     // const project = e.target.parentNode.id;
    
     const itemTitleInput     = document.createElement('input');
     itemTitleInput.type      = 'text';
     itemTitleInput.id        = 'new-item-title';
     itemTitleInput.name      = 'itemTitle';
-    itemTitleInput.placeholderText = 'To do'
+    itemTitleInput.placeholder = `To do`
 
     const itemDueDateInput     = document.createElement('input');
     itemDueDateInput.type      = 'date';
@@ -376,11 +397,12 @@ function createAddItemModal2() {
     project.value = _lastOpenedProject;
 
     addItemForm.appendChild(project);
-    addItemForm.appendChild(itemTitleInput);
-    addItemForm.appendChild(itemDueDateInput);
-    addItemForm.appendChild(itemDueDateInput);
-    addItemForm.appendChild(dropdownPriority)
-    addItemForm.appendChild(submitBtn);
+    formTop.appendChild(itemTitleInput);
+    formBottom.appendChild(itemDueDateInput);
+    formBottom.appendChild(dropdownPriority);
+    formBottom.appendChild(submitBtn);
+    addItemForm.appendChild(formTop);   
+    addItemForm.appendChild(formBottom);
 
     addItemForm.onsubmit = addItem;
     addItemModal.appendChild(addItemForm);
@@ -390,107 +412,12 @@ function createAddItemModal2() {
 
 // process item form 2
 
-function createAddItemModal() {
-    const addItemModal    = document.createElement('div');
-    addItemModal.classList.add('modal');
-    addItemModal.id       = 'add-item-modal';
-
-    const modalLabel = document.createElement('h3');
-    modalLabel.classList.add('modal-label');
-    modalLabel.id = 'item-modal-label';
-    modalLabel.textContent = 'New task';
-
-    const closeModalBtn = document.createElement('div');
-    closeModalBtn.classList.add('modal-close-btn');
-    // closeModalBtn.addEventListener('click', closeAddItemModal);
-
-    const addItemForm = document.createElement('form');
-    addItemForm.id    = 'add-item-form';
-
-    const dropdownProjects = document.createElement('select');
-    const dropdownProjectsLabel = document.createElement('label');
-    dropdownProjectsLabel.innerText = 'Project: '
-    dropdownProjects.id = 'selectProject';
-    for(let i=0; i<_projects.length; i++) {
-        let project = _projects[i];
-        const option = document.createElement('option');
-        option.value = project.title;
-        option.innerText = project.title;
-        dropdownProjects.appendChild(option);
-    }    
-
-    const itemTitleLabel     = document.createElement('label');
-    itemTitleLabel.id = 'itemTitle'
-    itemTitleLabel.innerText = 'Title:'
-    const itemTitleInput     = document.createElement('input');
-    itemTitleInput.type      = 'text';
-    itemTitleInput.id        = 'new-item-title';
-    itemTitleInput.name      = 'itemTitle';
-    
-    const itemDueDateLabel     = document.createElement('label');
-    itemDueDateLabel.id = 'itemDueDate'
-    itemDueDateLabel.innerText = 'Due date:'
-    const itemDueDateInput     = document.createElement('input');
-    itemDueDateInput.type      = 'date';
-    itemDueDateInput.id        = 'new-item-duedate';
-    itemDueDateInput.name      = 'itemDueDate';
-    
-    const dropdownPriority = document.createElement('select');
-    const dropdownPriorityLabel = document.createElement('label');
-    dropdownPriority.id = 'selectPriority';
-    dropdownPriorityLabel.id = 'selectPriorityLabel';
-    dropdownPriorityLabel.innerText = 'Priority: '
-    const lowPriority = document.createElement('option');
-    lowPriority.value = 'Low';
-    lowPriority.innerText = 'Low';
-    const mediumPriority = document.createElement('option');
-    mediumPriority.value = 'Medium';
-    mediumPriority.innerText = 'Medium';
-    const highPriority = document.createElement('option');
-    highPriority.value = 'High';
-    highPriority.innerText = 'High';
-    const critPriority = document.createElement('option');
-    critPriority.value = 'Critical';
-    critPriority.innerText = 'Critical';
-
-    dropdownPriority.appendChild(lowPriority)
-    dropdownPriority.appendChild(mediumPriority)
-    dropdownPriority.appendChild(highPriority)
-    dropdownPriority.appendChild(critPriority)
-    
-    const submitBtn = document.createElement('button');
-    submitBtn.type = 'submit';
-    submitBtn.id = 'item-modal-submit-btn'
-    submitBtn.innerText = 'Submit'
-
-    addItemForm.appendChild(dropdownProjectsLabel)
-    addItemForm.appendChild(dropdownProjects);
-    addItemForm.appendChild(itemTitleLabel);
-    addItemForm.appendChild(itemTitleInput);
-    addItemForm.appendChild(itemDueDateLabel);
-    addItemForm.appendChild(itemDueDateInput);
-    addItemForm.appendChild(dropdownPriorityLabel)
-    addItemForm.appendChild(dropdownPriority);
-    addItemForm.appendChild(submitBtn);
-
-
-    addItemForm.onsubmit = addItem;
-    addItemModal.appendChild(modalLabel)
-    addItemModal.appendChild(closeModalBtn)
-    addItemModal.appendChild(addItemForm);
-    
-    return addItemModal;
-}
-
-
-
 function closeAllModals() {
     const addItemModal = document.getElementById('add-item-modal');
     const addProjectModal = document.getElementById('add-project-modal');
-    addItemModal.classList.remove('opened')
-    addProjectModal.classList.remove('opened')
-    addItemModal.classList.add('closed')
-    addProjectModal.classList.add('closed')
+    addItemModal.classList.remove('modal-active');
+    addProjectModal.classList.remove('modal-active')
+
 }
 
 function resetForms() {
@@ -510,7 +437,7 @@ function processItemFormData() {
     const title    = document.getElementById('new-item-title').value
     let dueDate  = document.getElementById('new-item-duedate').value
     if(dueDate){
-        dueDate = format(parseISO(dueDate), ('eee, ' + 'MMM ' + 'dd, ' + 'yyyy'));
+        dueDate = format(parseISO(dueDate), ("eee, " + "MMMM " + "dd"));
     }
     const priority = document.getElementById('selectPriority').value
     const project  = document.getElementById('selectProject').value
@@ -623,9 +550,10 @@ function renderProject(project) {
         project = createProject('Default');
         _projects.push(project);
     }
+    _lastOpenedProject = project.title;
+
     const main = document.getElementById('main');
     main.appendChild(createProjectCard(project));
-    _lastOpenedProject = project.title;
     saveLocal();
 }
 

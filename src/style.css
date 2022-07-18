@@ -15,6 +15,11 @@ html, body {
     padding: 10px;
 }
 
+#add-item-form {
+    /* display: flex; */
+    /* width: 1000px; */
+}
+
 #content {
     display: flex;
     justify-content: flex-start;
@@ -29,6 +34,7 @@ html, body {
     width: 300px;
     height: auto;
     background-color: rgb(215, 250, 255);
+
 }
 
 .menu-title {
@@ -40,6 +46,7 @@ html, body {
     cursor: pointer;
     padding: 5px;
     text-align: left;
+
 }
 
 .sidebar-menu-active, .collapsible:hover {
@@ -54,23 +61,19 @@ html, body {
 }
 
 
-
-
-
-
-#add-item-form,
+/* #add-item-form,
 #add-project-form {
     display: grid;
     grid-template-columns: max-content max-content;
     grid-gap: 5px;
-}
+} */
 
 label {
     text-align: right;
 }
 
 input {
-    height: 50px;
+    height: 35px;
 }
 
 
@@ -79,7 +82,7 @@ input {
     display: flex;
     flex-direction: column;
     height: 500px;
-    width: 450px;
+    width: auto;
     padding: 10px;
     margin: 15px;
     /* box-shadow: -4px 4px black;
@@ -90,9 +93,12 @@ input {
 
 .project-card-header {
     display: flex;
-    justify-content: space-between;
-    padding: 5px;
+    justify-content: flex-start;
+    padding: 25px;
+    width: 1000px;
     margin-bottom: 5px;
+    background-color: rgb(242, 242, 242);
+
 }
 
 .project-card-title {
@@ -107,7 +113,7 @@ input {
 }
 
 .project-item-card-container {
-    
+    width: auto;
 }
 
 .project-card-complete {
@@ -121,6 +127,7 @@ input {
 }
 
 .project-card-add-item-btn {
+    /* display: none; */
     font-size: 2.5rem;
     color: lightgray;
     cursor: pointer;
@@ -136,15 +143,40 @@ input {
     justify-content: space-between;
     background-color: white;
     margin-bottom: 15px;
+    border: 2px solid rgb(68, 68, 68);
+    padding: 15px;
+    width: fit-content;
+    /* padding-left: 0; */
     /* border: 1px dotted rosybrown; */
     border-radius: 15px;
+    box-shadow: -4px 4px rgb(238, 78, 78);
+    transition: .1s;
 }
+
+/* .item-card:after {
+    position: absolute;
+    content: '';
+    width: 100%;
+    border: 2px solid black;
+} */
+
+.item-card:hover {
+    box-shadow: none;
+}
+
 
 .item-card-left {
     display: flex;
     justify-content: flex-start;
     gap: 10px;
     align-items: center;
+    margin-right: 20px;
+}
+
+.item-card-right {
+    font-style: italic;
+    color: gray;
+    text-justify: left;
 }
 
 .item-card-complete {
@@ -196,8 +228,10 @@ input {
 #main {
     display: flex;
     flex-direction: column;
+    flex-wrap: wrap;
     padding: 25px;
     height: 100%;
+    /* width: 20000px; */
 }
 
 .projects-placeholder {
@@ -273,17 +307,52 @@ button {
 }
 
 .item-complete-btn {
-    width: 18px;
-    height: 18px;
+    width: 15px;
+    height: 15px;
     background-color: white;
-    border: 1px solid lightgreen;
-    border-radius: 50%;
+    border-radius: 25%;
     cursor: pointer;
 }
 
-.item-complete-btn:hover {
-    background-color: lightgreen;
+/* .item-complete-btn::before {
+    position: absolute;
+    content: '';
+    width: 15px;
+    height: 15px;
+    border-radius: 15%;
+    box-sizing: border-box;
+    border-top: 2px solid rgb(68, 68, 68);
+    border-right: 2px solid rgb(68, 68, 68);
+
+} */
+
+.item-complete-btn-low {
+    border: 2px solid rgb(144, 238, 199);
 }
+
+.item-complete-btn-medium {
+    border: 2px solid rgb(238, 232, 144);
+}
+.item-complete-btn-high,
+.item-complete-btn-critical {
+    border: 2px solid rgb(238, 144, 144);
+}
+
+
+.item-complete-btn-low:hover {
+    background-color:rgb(144, 238, 199);
+}
+.item-complete-btn-medium:hover {
+    background-color: rgb(238, 232, 144);
+}
+.item-complete-btn-high:hover,
+.item-complete-btn-critical:hover {
+    background-color: rgb(238, 144, 144);
+}
+
+
+
+    
 
 .item-remove-btn,
 .modal-close-btn {
