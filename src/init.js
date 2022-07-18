@@ -1,8 +1,6 @@
 // import loadHome from './pages/home';
 
 // TODO
-// front end
-// In progress & complete project columns
 // Undo completed tasks (Complete button currently just copies itself)
 // Preference to send completed tasks to beginning or end or list
 // Form validation
@@ -10,7 +8,6 @@
 // drag n drop
 // buttons dont work on completed projects
 // close all modals when one is clicked to open
-// sidebar (App, Stats)
 // Footer can have switches (mode, sorting, etc)
 // Close buttons on project modal
 // Add 'number of days until due'
@@ -20,6 +17,9 @@
 // Gray out add task button, or allow users to create a project within the task modal?
 // Remove task button does not work on completed tasks
 // Make item cards sleeker
+// Stats sidebar
+// Add task button not currently working on addproject button
+// convert opened/closed classes to single js/css active toggle
 
 import {isAfter, format, getDay, parseISO} from 'date-fns';
 
@@ -128,7 +128,9 @@ function createProject(title) {
 
 function createProjectCard(project) {
     const projectCard = document.createElement('div');
+    const cardHeaderLeft = document.createElement('div');
     const projectCardHeader = document.createElement('div');
+    const addItemBtn = document.createElement('div');
     const btnContainer = document.createElement('div');
     const itemCardContainer = document.createElement('div');
 
@@ -137,16 +139,15 @@ function createProjectCard(project) {
     if(project.isComplete){
         projectCard.classList.add('project-card-complete')
     }
+
+    cardHeaderLeft.classList.add('card-header-left')
     projectCardHeader.classList.add('project-card-header')
     btnContainer.classList.add('project-card-btn-container');
     itemCardContainer.classList.add('project-item-card-container');
 
-    const addItemBtn = document.createElement('button');
     addItemBtn.classList.add('project-card-add-item-btn');
     addItemBtn.textContent = '+';
-    addItemBtn.addEventListener('click', () => {
-        openAddItemModal();
-    })
+    addItemBtn.addEventListener('click', openAddItemModal);
     const projectCardTitle = document.createElement('h1');
     projectCardTitle.classList.add('project-card-title');
     projectCardTitle.textContent = `${project.title}`;
@@ -167,11 +168,11 @@ function createProjectCard(project) {
         updatePage();
     })
    
-
+    cardHeaderLeft.appendChild(projectCardTitle);
+    cardHeaderLeft.appendChild(addItemBtn);
     btnContainer.appendChild(completeBtn);
     btnContainer.appendChild(delBtn);
-    projectCardHeader.appendChild(projectCardTitle);
-    // projectCardHeader.appendChild(addItemBtn)
+    projectCardHeader.appendChild(cardHeaderLeft);
     projectCardHeader.appendChild(btnContainer);
     projectCard.appendChild(projectCardHeader);
 
@@ -509,9 +510,7 @@ function removeItem(itemToRemove) {
     } else {
         project.items = project.items.filter((item) => item.title !== itemToRemove.title);
     }
-    
-    updatePage();
-}
+a}
 
 function getProject(title) {
     return _projects.find((project) => project.title === title);
@@ -567,7 +566,14 @@ function renderProjectCards() {
  
 
     updateDropdown();
+    updateSidebarMenu();
     console.log('Project cards rendered')
+}
+
+function renderProject(project) {
+    resetPage();
+    const main = document.getElementById('main');
+    main.appendChild(createProjectCard(project));
 }
 
 // base
@@ -578,6 +584,104 @@ function createAppContainer() {
     content.id = 'content';
 
     return content;
+}
+
+function createSidebar() {
+    const sidebar = document.createElement('div');
+    sidebar.classList.add('sidebar');
+    sidebar.id = 'sidebar';
+
+    return sidebar;
+}
+
+function createSidebarMenus() {
+    const sidebar = document.getElementById('sidebar');
+    sidebar.innerHTML = '';
+    const menuContainer = document.createElement('div');
+    menuContainer.id = 'sidebar-menus-container';
+
+    const projectMenuTitle = document.createElement('p');
+    projectMenuTitle.id = 'project-menu-title';
+    projectMenuTitle.classList.add('menu-title');
+    projectMenuTitle.classList.add('collapsible');
+    projectMenuTitle.textContent = '📚Projects'
+    projectMenuTitle.addEventListener('click', (e) => {
+        e.target.classList.toggle('active');
+        console.log(e.target);
+        const projects = e.target.nextElementSibling;
+        if(projects.style.display === 'block') {
+            projects.style.display = 'none';
+        } else {
+            projects.style.display = 'block';
+        }
+    })
+
+
+    menuContainer.appendChild(projectMenuTitle);
+
+    const projectMenu = document.createElement('ul');
+    projectMenu.id = 'sidebar-projects-dropdown';
+   
+    for(let project of _projects){
+        console.log('Im running@')
+        const projOption = document.createElement('li');
+        projOption.classList.add('sidebar-projects-dropdown-option');
+        projOption.id = project.title;
+        projOption.textContent = project.title;
+        projOption.addEventListener('click', () => {
+            renderProject(project);
+        })
+
+        projectMenu.appendChild(projOption);
+    }
+    menuContainer.appendChild(projectMenu);
+
+    const taskMenuTitle = document.createElement('p');
+    taskMenuTitle.id = 'task-menu-title';
+    taskMenuTitle.classList.add('menu-title');
+    taskMenuTitle.classList.add('collapsible')
+    taskMenuTitle.textContent = '☑️Tasks'
+    taskMenuTitle.addEventListener('click', (e) => {
+        e.target.classList.toggle('active');
+        console.log(e.target);
+        const tasks = e.target.nextElementSibling;
+        if(tasks.style.display === 'block') {
+            tasks.style.display = 'none';
+        } else {
+            tasks.style.display = 'block';
+        }
+    })
+
+    menuContainer.appendChild(taskMenuTitle);
+    const taskMenu = document.createElement('ul');
+    taskMenu.id = 'sidebar-tasks-dropdown';
+
+    const tasksAll = document.createElement('li');
+    tasksAll.classList.add('sidebar-tasks-menu-card');
+    tasksAll.id = 'sidebar-tasks-all';
+    tasksAll.innerHTML = `All tasks`
+    const tasksDay = document.createElement('li');
+    tasksDay.classList.add('sidebar-tasks-menu-card');
+    tasksDay.id = 'sidebar-tasks-within-day';
+    tasksDay.innerHTML = `Within the <b>day</b>`
+    const tasksWeek = document.createElement('li');
+    tasksWeek.classList.add('sidebar-tasks-menu-card');
+
+    tasksWeek.id = 'sidebar-tasks-within-week';
+    tasksWeek.innerHTML = `<p>Within the <b>week</b>`
+    const tasksMonth = document.createElement('li');
+    tasksMonth.classList.add('sidebar-tasks-menu-card');
+
+    tasksMonth.id = `sidebar-tasks-within-month`;
+    tasksMonth.innerHTML = `<p>Within the <b>month</b>`
+
+    taskMenu.appendChild(tasksAll);
+    taskMenu.appendChild(tasksDay);
+    taskMenu.appendChild(tasksWeek);
+    taskMenu.appendChild(tasksMonth);
+
+    menuContainer.appendChild(taskMenu);
+    sidebar.appendChild(menuContainer);
 }
 
 function createHeader() {
@@ -606,20 +710,35 @@ function createFooter() {
 }
 
 function initTodoApp() {
-    const content = document.body.appendChild(createAppContainer());
 
-    content.appendChild(createHeader());
-    content.appendChild(createAddItemModal());
-    content.appendChild(createAddProjectModal());
+    const header = document.body.appendChild(createHeader());
+    document.body.appendChild(createAddItemModal());
+    document.body.appendChild(createAddProjectModal());
+    header.appendChild(createAppNav());
+
+    const content = document.body.appendChild(createAppContainer());
+    content.appendChild(createSidebar());
 
     content.appendChild(createMain());
-    content.appendChild(createFooter());
     
-    const header = document.getElementById('header')
-    header.appendChild(createAppNav());
-    console.log('date date')
-    console.log(isAfter(new Date(1995, 11, 17), new Date(1997, 10, 5)))
+    
     restoreLocal();
+    createSidebarMenus();
+    document.body.appendChild(createFooter());
+
+
+}
+
+const updateSidebarMenu = () => {
+    const sidebarMenu = document.getElementById('sidebar-menus-container');
+    if(sidebarMenu === null){
+        console.log('null god');
+        return createSidebarMenus;
+    } else {
+        console.log('Ill never take the null path')
+        sidebarMenu.innerHTML = '';
+        createSidebarMenus();
+    }
 }
 
 const updatePage = () => {
@@ -628,7 +747,7 @@ const updatePage = () => {
     sortItems();
 
     resetPage();
-    renderProjectCards();
+    // renderProjectCards();
 }
 
 const saveLocal = () => {
