@@ -18,8 +18,9 @@ html, body {
 #add-item-form-bottom {
     display: flex;
     width: 450px;
-    margin-top: 5px;
+    margin-top: 10px;
     justify-content: right;
+    gap: 5px;
 }
 
 #new-item-title {
@@ -73,14 +74,6 @@ html, body {
     list-style-type: none;
 }
 
-
-/* #add-item-form,
-#add-project-form {
-    display: grid;
-    grid-template-columns: max-content max-content;
-    grid-gap: 5px;
-} */
-
 label {
     text-align: right;
 }
@@ -98,7 +91,7 @@ input {
     width: auto;
     
     margin: 10px;
-    margin-top: 25px;
+    margin-top: 75px;
     padding: 25px;
     padding-top: 0;
     /* box-shadow: -4px 4px black;
@@ -130,6 +123,8 @@ input {
 }
 
 .project-item-card-container {
+    position: fixed;
+    margin-top: 220px;
     width: auto;
 }
 
@@ -145,12 +140,12 @@ input {
 
 .project-card-add-item-btn {
     /* display: none; */
-    display: inline-block;
+    /* display: inline-block; */
     font-size: 2.5rem;
     color: lightgray;
     background-color: rgb(53, 53, 53);
     cursor: pointer;
-    height: 50px;
+    height: 30px;
     width: 425px;
     margin-bottom: 15px;
     padding: 10px;
@@ -166,17 +161,77 @@ input {
 }
 
 #modal-calendar {
-    width: 100px;
+    width: auto;
+    font-size: 0.9rem;
+    /* color: lightgray; */
+    width: 105px;
+    border-radius: 15px;
 }
 
 #calendar-modal {
     display: none;
 }
 
-#calendar-modal-calendar-btn {
+.calendar-modal-active,
+.priority-modal-active {
+    position: absolute;
+    background-color: rgb(255, 255, 255);
+    border: 3px solid rgb(67, 136, 84);
+    padding: 10px;
+    border-radius: 15px;
+    margin-left: 102px;
+    margin-top: 110px;
+}
+
+
+
+#calendar-modal-calendar-btn,
+#priority-modal-priority-btn {
+    width: 30;
+    height: 30;
+    font-size: 1.5rem;
+    background-color: white;
+    display: flex;
+    padding: 5px;
+    border-radius: 25px;
+    justify-content: center;
+    align-items: center;
+    box-shadow: -3px 3px pink;
+    transition-duration: 0.1s;
+}
+
+#calendar-modal-calendar-btn:hover, 
+#priority-modal-priority-btn:hover {
+    scale: 1.1;
+}
+
+#priority-modal {
+    display: none;
+}
+
+#calendar-form {
+    display: flex;
+    /* flex-direction: column; */
+    justify-content: center;
+    align-items: center;
+    height: 30px;
     width: auto;
-    height: auto;
-    font-size: 2.0rem;
+    /* width: auto; */
+    gap: 5px;
+}
+
+#calendar-modal-btn-container {
+    display: flex;
+    /* flex-direction: column; */
+    gap: 2px;
+}
+
+#calendar-modal-btn-container > button {
+    width: auto;
+}
+
+.modal-button {
+    margin-right: 5px;
 }
 
 .item-card {

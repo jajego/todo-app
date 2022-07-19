@@ -46,7 +46,6 @@ class Project {
     constructor(title) {
         this.title = title;
         this.items = [];
-        this.completedItems = [];
         this.isComplete = false;
     }
 
@@ -217,9 +216,7 @@ function createProjectCard(project) {
     for(let item of project.items){
         itemCardContainer.appendChild(createItemCard(item));
     }
-    for(let item of project.completedItems){
-        itemCardContainer.appendChild(createItemCard(item));
-    }
+   
     projectCard.appendChild(itemCardContainer);
     
 
@@ -394,6 +391,7 @@ function createAddItemModal2() {
     calendarBtn.appendChild(calendarImg);
     // calendarBtn.textContent = '📅';
     // calendarBtn.innerHTML = new Image(calendarIcon);
+    calendarBtn.classList.add('modal-button')
     calendarBtn.id = 'calendar-modal-calendar-btn';
     calendarBtn.addEventListener('click', () => {
         calendarModal.classList.toggle('calendar-modal-active');
@@ -421,13 +419,14 @@ function createAddItemModal2() {
 
 
     const priorityBtn = document.createElement('div');
+    priorityBtn.classList.add('modal-button')
     const priorityImg = document.createElement('img');
     priorityImg.src = priorityIcon;
     priorityImg.width = '30';
     priorityImg.height = '30';
     priorityBtn.appendChild(priorityImg);
 
-    priorityBtn.id = 'calendar-modal-priority-btn';
+    priorityBtn.id = 'priority-modal-priority-btn';
     priorityBtn.addEventListener('click', () => {
         priorityModal.classList.toggle('priority-modal-active');
         if(priorityModal.style.display === 'block'){
@@ -700,13 +699,9 @@ function removeProject(projectToRemove) {
 
 function removeItem(itemToRemove) {
     const project = getProject(itemToRemove.project);
-    if(itemToRemove.isComplete){
-        console.log('Removing completed task')
-        project.completedItems = project.completedItems.filter((item) => item.title !== itemToRemove.title);
-    } else {
         project.items = project.items.filter((item) => item.title !== itemToRemove.title);
     }
-}
+
 
 function getProject(title) {
     return _projects.find((project) => project.title === title);
