@@ -25,15 +25,18 @@ html, body {
     justify-content: flex-start;
     gap: 0;
     /* flex-direction: column; */
-    background-color: white;
     min-height: 100%;
     height: 100%;
+    background-color: #323232;
+    background-color: #303030;
+    /* background-image: url("data:image/svg+xml,%3Csvg width='70' height='70' viewBox='0 0 70 70' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23323232' fill-opacity='0.4' fill-rule='evenodd'%3E%3Cpath d='M0 0h35v35H0V0zm5 5h25v25H5V5zm5 5h15v15H10V10zm5 5h5v5h-5v-5zM40 5h25v25H40V5zm5 5h15v15H45V10zm5 5h5v5h-5v-5zM70 35H35v35h35V35zm-5 5H40v25h25V40zm-5 5H45v15h15V45zm-5 5h-5v5h5v-5zM30 40H5v25h25V40zm-5 5H10v15h15V45zm-5 5h-5v5h5v-5z'/%3E%3C/g%3E%3C/svg%3E"); */
+
 }
 
 #sidebar {
     width: 300px;
     height: auto;
-    background-color: rgb(215, 250, 255);
+    background-color: rgb(32, 32, 32);
 
 }
 
@@ -42,10 +45,11 @@ html, body {
 }
 
 .collapsible {
-    background-color: #eee;
+    background-color: rgb(32, 32, 32);
     cursor: pointer;
     padding: 5px;
     text-align: left;
+    color:rgb(228, 228, 228)
 
 }
 
@@ -83,8 +87,8 @@ input {
     flex-direction: column;
     height: 500px;
     width: auto;
-    padding: 10px;
     margin: 15px;
+    padding: 25px;
     /* box-shadow: -4px 4px black;
     border: 1px solid black;
     border-radius: 50px; */
@@ -94,15 +98,15 @@ input {
 .project-card-header {
     display: flex;
     justify-content: flex-start;
-    padding: 25px;
     width: 1000px;
     margin-bottom: 5px;
-    background-color: rgb(242, 242, 242);
+    color: white;
+    /* background-color: rgb(138, 138, 138); */
 
 }
 
 .project-card-title {
-    /* width: 70%; */
+    font-size: 4.0rem;
 }
 
 
@@ -141,7 +145,8 @@ input {
 .item-card {
     display: flex;
     justify-content: space-between;
-    background-color: white;
+    align-items: center;
+    background-color: rgb(70, 70, 70);
     margin-bottom: 15px;
     border: 2px solid rgb(68, 68, 68);
     padding: 15px;
@@ -151,6 +156,7 @@ input {
     border-radius: 15px;
     box-shadow: -4px 4px rgb(238, 78, 78);
     transition: .1s;
+    color: white;
 }
 
 /* .item-card:after {
@@ -174,9 +180,13 @@ input {
 }
 
 .item-card-right {
+    display: flex;
+    margin-top: 2px;
+    justify-content: flex-end;
+    align-items: center;
     font-style: italic;
-    color: gray;
-    text-justify: left;
+    font-weight: bold;
+    color: rgb(151, 151, 151);
 }
 
 .item-card-complete {
@@ -202,6 +212,7 @@ input {
 
 .item-critical {
     background-color: rgb(241, 224, 224);
+    color: rgb(75, 75, 75);
 }
 
 .item-card-complete {
@@ -214,7 +225,7 @@ input {
 #header {
     padding: 10px;
     height: 50px;
-    background-color: rgb(214, 234, 252);
+    background-color: rgb(12, 18, 33);
     display: flex;
     justify-content: flex-start;
     align-items: center;
@@ -229,9 +240,9 @@ input {
     display: flex;
     flex-direction: column;
     flex-wrap: wrap;
-    padding: 25px;
     height: 100%;
-    /* width: 20000px; */
+background-color: #303030;
+/* background-image: url("data:image/svg+xml,%3Csvg width='70' height='70' viewBox='0 0 70 70' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23323232' fill-opacity='0.4' fill-rule='evenodd'%3E%3Cpath d='M0 0h35v35H0V0zm5 5h25v25H5V5zm5 5h15v15H10V10zm5 5h5v5h-5v-5zM40 5h25v25H40V5zm5 5h15v15H45V10zm5 5h5v5h-5v-5zM70 35H35v35h35V35zm-5 5H40v25h25V40zm-5 5H45v15h15V45zm-5 5h-5v5h5v-5zM30 40H5v25h25V40zm-5 5H10v15h15V45zm-5 5h-5v5h5v-5z'/%3E%3C/g%3E%3C/svg%3E");    width: 20000px; */
 }
 
 .projects-placeholder {
@@ -309,7 +320,7 @@ button {
 .item-complete-btn {
     width: 15px;
     height: 15px;
-    background-color: white;
+    background-color: rgb(43, 43, 43) ;
     border-radius: 25%;
     cursor: pointer;
 }

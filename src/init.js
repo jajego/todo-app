@@ -187,25 +187,25 @@ function createProjectCard(project) {
     projectCardTitle.classList.add('project-card-title');
     projectCardTitle.textContent = `${project.title}`;
 
-    const completeBtn = document.createElement('button');
-    completeBtn.classList.add('complete-project-button');
-    completeBtn.innerText = 'O';
-    completeBtn.addEventListener('click', () => {
-        completeProject(project);
-    })
+    // const completeBtn = document.createElement('button');
+    // completeBtn.classList.add('complete-project-button');
+    // completeBtn.innerText = 'O';
+    // completeBtn.addEventListener('click', () => {
+    //     completeProject(project);
+    // })
 
-    const delBtn = document.createElement('button');
-    delBtn.classList.add('delete-project-btn');
-    delBtn.innerText = 'X';
-    delBtn.addEventListener('click', (e) => {
-        // could be its own removeProject function
-        removeProject(project);
-        updatePage();
-    })
+    // const delBtn = document.createElement('button');
+    // delBtn.classList.add('delete-project-btn');
+    // delBtn.innerText = 'X';
+    // delBtn.addEventListener('click', (e) => {
+    //     // could be its own removeProject function
+    //     removeProject(project);
+    //     updatePage();
+    // })
    
     projectCardHeader.appendChild(projectCardTitle);
-    btnContainer.appendChild(completeBtn);
-    btnContainer.appendChild(delBtn);
+    // btnContainer.appendChild(completeBtn);
+    // btnContainer.appendChild(delBtn);
     projectCardHeader.appendChild(btnContainer);
     projectCard.appendChild(projectCardHeader);
     projectCard.appendChild(addItemBtn);
@@ -220,6 +220,8 @@ function createProjectCard(project) {
     }
     projectCard.appendChild(itemCardContainer);
     
+
+
     return projectCard;
 }
 
@@ -236,8 +238,26 @@ function completeProject(projectToComplete) {
 }
 
 function completeItem(itemToComplete) {
-    itemToComplete.isComplete = true;    
+    itemToComplete.isComplete = true;
+    const project = getProject(itemToComplete.project);
+    const indexOfItem = project.items.findIndex((item) => item.title === itemToComplete.title);
+    const firstIndex = findFirstCompletedItem(project);
+    if(firstIndex && firstIndex !== 0){
+        project.items.splice(firstIndex, 0, itemToComplete)
+    } else {
+        project.items.push(project.items.splice(indexOfItem,1)[0])
+    }    
     updatePage();
+}
+
+function findFirstCompletedItem(project) {
+    const firstCompleted = project.items.find((item) => item.isComplete);
+    if(!firstCompleted){
+        return null;
+    }
+    const indexOfItem = project.items.findIndex((item) => item.title === firstCompleted.title);
+    console.log(indexOfItem);
+    return indexOfItem;
 }
 
 function createAppNav() {
@@ -462,7 +482,28 @@ function addItem(e) {
     console.log('Succsesfully processed item form data')
     const project = getProject(newItem.project);
     let indexOfProject = _projects.findIndex((project) => project.title == newItem.project);
-    _projects[indexOfProject].items.push(newItem);
+    if(newItem.priority === 'Critical'){
+        _projects[indexOfProject].items.unshift(newItem)
+        resetForms();
+        updatePage();
+        return;
+    }  
+    
+    const firstIndex = findFirstCompletedItem(_projects[indexOfProject]);
+    console.log(`First completed index is ${firstIndex}`)
+    if(firstIndex !== null){
+        if(firstIndex == 0 || firstIndex == -1) {
+            console.log('UNSHIFITNG')
+            _projects[indexOfProject].items.unshift(newItem)
+        } else {
+            console.log('SPLICING')
+            _projects[indexOfProject].items.splice(firstIndex, 0, newItem);
+        }
+    } else {
+        console.log('PUSHING')
+        _projects[indexOfProject].items.push(newItem);
+    }
+    
     resetForms();
     updatePage();
 
@@ -475,7 +516,6 @@ function removeProject(projectToRemove) {
 
 function removeItem(itemToRemove) {
     const project = getProject(itemToRemove.project);
-    console.log('project is: ' + project)
     if(itemToRemove.isComplete){
         console.log('Removing completed task')
         project.completedItems = project.completedItems.filter((item) => item.title !== itemToRemove.title);
@@ -486,21 +526,6 @@ function removeItem(itemToRemove) {
 
 function getProject(title) {
     return _projects.find((project) => project.title === title);
-}
-
-function sortItems() {
-    for(let project of _projects){
-        for(let item of project.items){
-            if(item.priority == 'Critical'){
-                const indexOfItem = project.items.findIndex((task) => task.title === item.title);
-                project.items.unshift(project.items.splice(indexOfItem, 1)[0]);
-            }
-            if(item.isComplete){
-                const indexOfItem = project.items.findIndex((task) => task.title === item.title);
-                project.items.push(project.items.splice(indexOfItem, 1)[0])
-            }
-        }
-    }
 }
 
 function sortProjects() {
@@ -723,13 +748,12 @@ const updateSidebarMenu = () => {
 
 const updatePage = () => {
     saveLocal();
-    sortProjects();
-    sortItems();
-    
     resetPage();
     renderProject(getProject(_lastOpenedProject))
     // updateDropdown();
     updateSidebarMenu();
+    sortProjects();
+    // sortItems();
     // renderProjectCards();
 }
 
