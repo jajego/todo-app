@@ -18,16 +18,15 @@
 // Add task button not currently working on addproject button
 // Edit task
 // double-click project name to rename
-// Items being sent to wrong project sometimes, need to tweak _lastOpenedProject updates
-// Complete items sort every refresh lol
 
 // IDEAS
 // Arrows pointing to certain tasks from the right - Alert! This task is due in 2 days! etc
 // Be able to tag projects by color
 // Communicate priority by border around OR just color the circle differently
 // Color blind mode
+// Be able to pin an item
 
-import {isAfter, format, getDay, parseISO} from 'date-fns';
+import {isAfter, format, getDay, parseISO, add} from 'date-fns';
 import { fi } from 'date-fns/locale';
 
 class Item {
@@ -166,7 +165,7 @@ function createProjectCard(project) {
 
     addItemBtn.classList.add('project-card-add-item-btn');
     addItemBtn.classList.add('add-item-btn-active');
-    addItemBtn.textContent = '+';
+    // addItemBtn.textContent = '+';
     addItemBtn.addEventListener('click', () => {
         const addItemModal = document.getElementById('add-item-modal');
         addItemModal.classList.toggle('modal-active');
@@ -270,7 +269,7 @@ function createAppNav() {
     const addItemBtn = document.createElement('button');
 
     addProjectBtn.classList.add('add-project-btn');
-    addProjectBtn.innerHTML = 'Add project';
+    addProjectBtn.innerHTML = 'New project';
     addProjectBtn.addEventListener('click', () => {
         addProjectModal.classList.toggle('modal-active');
         if(addProjectModal.style.display === 'block') {
@@ -379,10 +378,33 @@ function createAddItemModal2() {
     itemTitleInput.name      = 'itemTitle';
     itemTitleInput.placeholder = `To do`
 
-    const itemDueDateInput     = document.createElement('input');
-    itemDueDateInput.type      = 'date';
-    itemDueDateInput.id        = 'new-item-duedate';
-    itemDueDateInput.name      = 'itemDueDate';
+    const calendarModal = createCalendarModal();
+    calendarModal.id = 'calendar-modal';
+    addItemModal.appendChild(calendarModal);
+
+    const calendarBtn = document.createElement('div');
+    calendarBtn.textContent = '📅';
+    calendarBtn.id = 'calendar-modal-calendar-btn';
+    calendarBtn.addEventListener('click', () => {
+        calendarModal.classList.toggle('calendar-modal-active');
+        if(calendarModal.style.display === 'block'){
+            calendarModal.style.display = 'none';
+        } else {
+            calendarModal.style.display = 'block';
+        }
+    })
+    // calendarBtn.addEventListener('mouseover', () => {
+    //     calendarModal.classList.toggle('calendar-modal-active');
+    //     if(calendarModal.style.display === 'block'){
+    //         calendarModal.style.display = 'none';
+    //     } else {
+    //         calendarModal.style.display = 'block';
+    //     }
+    // })
+
+    // itemDueDateInput.type      = 'date';
+    // itemDueDateInput.id        = 'new-item-duedate';
+    // itemDueDateInput.name      = 'itemDueDate';
 
     const dropdownPriority = document.createElement('select');
     dropdownPriority.id = 'selectPriority';
@@ -407,7 +429,7 @@ function createAddItemModal2() {
     const submitBtn = document.createElement('button');
     submitBtn.type = 'submit';
     submitBtn.id = 'item-modal-submit-btn'
-    submitBtn.innerText = 'Submit'
+    submitBtn.innerText = 'Add task'
     submitBtn.addEventListener('click', console.log(submitBtn.parentNode))
 
     const project = document.createElement('input');
@@ -418,7 +440,7 @@ function createAddItemModal2() {
 
     addItemForm.appendChild(project);
     formTop.appendChild(itemTitleInput);
-    formBottom.appendChild(itemDueDateInput);
+    formBottom.appendChild(calendarBtn);
     formBottom.appendChild(dropdownPriority);
     formBottom.appendChild(submitBtn);
     addItemForm.appendChild(formTop);   
@@ -429,6 +451,64 @@ function createAddItemModal2() {
     
     return addItemModal;
 }
+
+function createCalendarModal() {
+    const modal = document.createElement('div');
+    modal.id = 'calendar-modal';
+    const form = document.createElement('form');
+    form.id = 'calendar-form';
+
+    let dueDate;
+
+    const btnContainer = document.createElement('div');
+    btnContainer.id = 'calendar-modal-btn-container';
+
+    const calendar = document.createElement('input');
+    calendar.type = 'date';
+    calendar.id = 'modal-calendar';
+    calendar.placeholder = 'Due date';
+
+    const todayBtn = document.createElement('button');
+    todayBtn.textContent = 'Today'
+    todayBtn.type = 'button';
+    todayBtn.id = 'today-btn';
+    todayBtn.value = 'today';
+    todayBtn.addEventListener('click', () => {
+        todayBtn.classList.toggle('active');
+        calendar.value = format(new Date(), 'yyyy' + '-' + 'MM' + '-' + 'dd');
+    })
+
+    const tomorrowBtn = document.createElement('button');
+    tomorrowBtn.textContent = 'Tomorrow';
+    tomorrowBtn.type = 'button';
+    tomorrowBtn.id = 'tomorrow-btn';
+    tomorrowBtn.value = 'tomorrrow';
+    tomorrowBtn.addEventListener('click', () => {
+        tomorrowBtn.classList.toggle('active');
+        calendar.value = format((add(new Date(), {days: 1})), 'yyyy' + '-' + 'MM' + '-' + 'dd');
+
+    })
+
+    const nextWeekBtn = document.createElement('button');
+    nextWeekBtn.textContent = 'Next week'
+    nextWeekBtn.type = 'button';
+    nextWeekBtn.id = 'next-week-btn';
+    nextWeekBtn.value = 'next-week';
+    nextWeekBtn.addEventListener('click', () => {
+        nextWeekBtn.classList.toggle('active');
+        calendar.value = format((add(new Date(), {weeks: 1})), 'yyyy' + '-' + 'MM' + '-' + 'dd');    })
+
+    btnContainer.appendChild(todayBtn);
+    btnContainer.appendChild(tomorrowBtn);
+    btnContainer.appendChild(nextWeekBtn);
+    form.appendChild(btnContainer);
+    form.appendChild(calendar);
+    modal.appendChild(form);
+
+    return modal;
+}
+
+
 
 // process item form 2
 
@@ -455,7 +535,9 @@ function processProjectFormData() {
 
 function processItemFormData() {
     const title    = document.getElementById('new-item-title').value
-    let dueDate  = document.getElementById('new-item-duedate').value
+    let dueDate  = processCalendarFormData();
+    console.log('-----------------')
+    console.log(dueDate)
     if(dueDate){
         dueDate = format(parseISO(dueDate), ("eee, " + "MMMM " + "dd"));
     }
@@ -463,6 +545,14 @@ function processItemFormData() {
     const project  = document.getElementById('selectProject').value
 
     return createItem(title, dueDate, priority, project)
+}
+
+function processCalendarFormData() {
+    const date = document.getElementById('modal-calendar').value;
+    // if(date) {
+    //     date = format(parseISO(dueDate), ("eee, " + "MMMM " + "dd"));
+    // }
+    return date;
 }
 
 function addProject(e) {

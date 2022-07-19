@@ -15,10 +15,19 @@ html, body {
     padding: 10px;
 }
 
-#add-item-form {
-    /* display: flex; */
-    /* width: 1000px; */
+#add-item-form-bottom {
+    display: flex;
+    width: 450px;
+    margin-top: 5px;
+    justify-content: right;
 }
+
+#new-item-title {
+    padding: 3px;
+    width: 440px;
+}
+
+
 
 #content {
     display: flex;
@@ -34,7 +43,7 @@ html, body {
 }
 
 #sidebar {
-    width: 300px;
+    width: 225px;
     height: auto;
     background-color: rgb(32, 32, 32);
 
@@ -87,8 +96,11 @@ input {
     flex-direction: column;
     height: 500px;
     width: auto;
-    margin: 15px;
+    
+    margin: 10px;
+    margin-top: 25px;
     padding: 25px;
+    padding-top: 0;
     /* box-shadow: -4px 4px black;
     border: 1px solid black;
     border-radius: 50px; */
@@ -99,7 +111,8 @@ input {
     display: flex;
     justify-content: flex-start;
     width: 1000px;
-    margin-bottom: 5px;
+    margin-left: 8px;
+    margin-bottom: 15px;
     color: white;
     /* background-color: rgb(138, 138, 138); */
 
@@ -132,15 +145,39 @@ input {
 
 .project-card-add-item-btn {
     /* display: none; */
+    display: inline-block;
     font-size: 2.5rem;
     color: lightgray;
+    background-color: rgb(53, 53, 53);
     cursor: pointer;
+    height: 50px;
+    width: 425px;
+    margin-bottom: 15px;
+    padding: 10px;
+}
+
+.project-card-add-item-btn::before {
+    content: '+';
+    position: absolute;
 }
 
 .project-card-add-item-btn:hover {
     background-color: rgb(228, 228, 228);
 }
 
+#modal-calendar {
+    width: 100px;
+}
+
+#calendar-modal {
+    display: none;
+}
+
+#calendar-modal-calendar-btn {
+    width: auto;
+    height: auto;
+    font-size: 2.0rem;
+}
 
 .item-card {
     display: flex;
@@ -225,11 +262,15 @@ input {
 #header {
     padding: 10px;
     height: 50px;
-    background-color: rgb(12, 18, 33);
+    background-color: rgb(12, 18, 25);
     display: flex;
-    justify-content: flex-start;
-    align-items: center;
-    
+    align-items: center;   
+}
+
+nav {
+    display: flex;
+    width: 100%;
+    justify-content: space-between;
 }
 
 #header button {
@@ -280,7 +321,7 @@ background-color: #303030;
 }
 
 .clear-local-storage-btn {
-    background-color: rebeccapurple;
+    background-color: rgb(186, 148, 224);
     color: white;
 }
 
