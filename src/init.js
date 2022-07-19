@@ -1,4 +1,6 @@
 // import loadHome from './pages/home';
+import calendarIcon from "../icons/calendar.jpg";
+import priorityIcon from "../icons/exclamation.png"
 
 // TODO
 // Undo completed tasks (Complete button currently just copies itself)
@@ -18,6 +20,7 @@
 // Add task button not currently working on addproject button
 // Edit task
 // double-click project name to rename
+// New project modal - maybe just in the header
 
 // IDEAS
 // Arrows pointing to certain tasks from the right - Alert! This task is due in 2 days! etc
@@ -382,8 +385,15 @@ function createAddItemModal2() {
     calendarModal.id = 'calendar-modal';
     addItemModal.appendChild(calendarModal);
 
+
     const calendarBtn = document.createElement('div');
-    calendarBtn.textContent = '📅';
+    const calendarImg = document.createElement('img');
+    calendarImg.src = calendarIcon;
+    calendarImg.width = '30';
+    calendarImg.height = '30';
+    calendarBtn.appendChild(calendarImg);
+    // calendarBtn.textContent = '📅';
+    // calendarBtn.innerHTML = new Image(calendarIcon);
     calendarBtn.id = 'calendar-modal-calendar-btn';
     calendarBtn.addEventListener('click', () => {
         calendarModal.classList.toggle('calendar-modal-active');
@@ -405,26 +415,47 @@ function createAddItemModal2() {
     // itemDueDateInput.type      = 'date';
     // itemDueDateInput.id        = 'new-item-duedate';
     // itemDueDateInput.name      = 'itemDueDate';
+    const priorityModal = createPriorityModal();
+    addItemModal.appendChild(priorityModal);
 
-    const dropdownPriority = document.createElement('select');
-    dropdownPriority.id = 'selectPriority';
-    const lowPriority = document.createElement('option');
-    lowPriority.value = 'Low';
-    lowPriority.innerText = 'Low';
-    const mediumPriority = document.createElement('option');
-    mediumPriority.value = 'Medium';
-    mediumPriority.innerText = 'Medium';
-    const highPriority = document.createElement('option');
-    highPriority.value = 'High';
-    highPriority.innerText = 'High';
-    const critPriority = document.createElement('option');
-    critPriority.value = 'Critical';
-    critPriority.innerText = 'Critical';
 
-    dropdownPriority.appendChild(lowPriority)
-    dropdownPriority.appendChild(mediumPriority)
-    dropdownPriority.appendChild(highPriority)
-    dropdownPriority.appendChild(critPriority)
+
+    const priorityBtn = document.createElement('div');
+    const priorityImg = document.createElement('img');
+    priorityImg.src = priorityIcon;
+    priorityImg.width = '30';
+    priorityImg.height = '30';
+    priorityBtn.appendChild(priorityImg);
+
+    priorityBtn.id = 'calendar-modal-priority-btn';
+    priorityBtn.addEventListener('click', () => {
+        priorityModal.classList.toggle('priority-modal-active');
+        if(priorityModal.style.display === 'block'){
+            priorityModal.style.display = 'none';
+        } else {
+            priorityModal.style.display = 'block';
+        }
+    })
+
+    // const dropdownPriority = document.createElement('select');
+    // dropdownPriority.id = 'selectPriority';
+    // const lowPriority = document.createElement('option');
+    // lowPriority.value = 'Low';
+    // lowPriority.innerText = 'Low';
+    // const mediumPriority = document.createElement('option');
+    // mediumPriority.value = 'Medium';
+    // mediumPriority.innerText = 'Medium';
+    // const highPriority = document.createElement('option');
+    // highPriority.value = 'High';
+    // highPriority.innerText = 'High';
+    // const critPriority = document.createElement('option');
+    // critPriority.value = 'Critical';
+    // critPriority.innerText = 'Critical';
+
+    // dropdownPriority.appendChild(lowPriority)
+    // dropdownPriority.appendChild(mediumPriority)
+    // dropdownPriority.appendChild(highPriority)
+    // dropdownPriority.appendChild(critPriority)
     
     const submitBtn = document.createElement('button');
     submitBtn.type = 'submit';
@@ -441,7 +472,7 @@ function createAddItemModal2() {
     addItemForm.appendChild(project);
     formTop.appendChild(itemTitleInput);
     formBottom.appendChild(calendarBtn);
-    formBottom.appendChild(dropdownPriority);
+    formBottom.appendChild(priorityBtn);
     formBottom.appendChild(submitBtn);
     addItemForm.appendChild(formTop);   
     addItemForm.appendChild(formBottom);
@@ -508,6 +539,69 @@ function createCalendarModal() {
     return modal;
 }
 
+function createPriorityModal() {
+    const modal = document.createElement('div');
+    modal.id = 'priority-modal';
+    const form = document.createElement('form');
+    form.id = 'priority-form';
+
+    const priorityInput = document.createElement('input');
+    priorityInput.classList.add('no-display');
+    priorityInput.id = 'priority-modal-input';
+
+    const btnContainer = document.createElement('div');
+    btnContainer.id = 'priority-modal-btn-container';
+
+    const lowBtn = document.createElement('button');
+    lowBtn.type = 'button';
+    lowBtn.textContent = 'Low';
+    lowBtn.classList.add('priority-modal-btn');
+    lowBtn.id = 'priority-modal-low-btn';
+    lowBtn.addEventListener('click', () => {
+        priorityInput.value = 'Low';
+    })
+    
+    const mediumBtn = document.createElement('button');
+    mediumBtn.type = 'button';
+    mediumBtn.textContent = 'Medium';
+
+    mediumBtn.classList.add('priority-modal-btn');
+    mediumBtn.id = 'priority-modal-medium-btn';
+    mediumBtn.addEventListener('click', () => {
+        priorityInput.value = 'Medium';
+    })
+    
+    const highBtn = document.createElement('button');
+    highBtn.type = 'button';
+    highBtn.textContent = 'High';
+
+    highBtn.classList.add('priority-modal-btn');
+    highBtn.id = 'priority-modal-high-btn';
+    highBtn.addEventListener('click', () => {
+        priorityInput.value = 'High';
+    })
+    
+    const criticalBtn = document.createElement('button');
+    criticalBtn.type = 'button';
+    criticalBtn.textContent = 'Critical';
+
+    criticalBtn.classList.add('priority-modal-btn');
+    criticalBtn.id = 'priority-modal-critical-btn';
+    criticalBtn.addEventListener('click', () => {
+        priorityInput.value = 'Critical';
+    })
+
+    form.appendChild(priorityInput);
+    btnContainer.appendChild(lowBtn);
+    btnContainer.appendChild(mediumBtn);
+    btnContainer.appendChild(highBtn);
+    btnContainer.appendChild(criticalBtn);
+    form.appendChild(btnContainer);
+    modal.appendChild(form);
+
+    return modal;
+}
+
 
 
 // process item form 2
@@ -541,7 +635,7 @@ function processItemFormData() {
     if(dueDate){
         dueDate = format(parseISO(dueDate), ("eee, " + "MMMM " + "dd"));
     }
-    const priority = document.getElementById('selectPriority').value
+    const priority = document.getElementById('priority-modal-input').value
     const project  = document.getElementById('selectProject').value
 
     return createItem(title, dueDate, priority, project)
