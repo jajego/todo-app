@@ -65,9 +65,9 @@ html, body {
 }
 
 .collapsible {
-    background-color: rgb(224, 224, 224);
+    background-color: rgb(235, 235, 235);
     cursor: pointer;
-    padding: 5px;
+    padding: 8px;
     color:rgb(0, 0, 0);
     text-align: left;
     padding-left: 10px;
@@ -87,7 +87,8 @@ html, body {
     list-style-type: none;
 }
 
-.sidebar-projects-dropdown-option {
+.sidebar-projects-dropdown-option,
+.sidebar-tasks-dropdown-option {
     font-size: 1.2rem;
     text-align: right;
     padding: 2px;
@@ -96,6 +97,7 @@ html, body {
 .sidebar-projects-dropdown-option-active {
     font-weight: 800;
 }
+
 
 label {
     text-align: right;
@@ -174,22 +176,25 @@ input {
     color: lightgray;
     background-color: rgb(255, 255, 255);
     cursor: pointer;
-    margin-left: 11px;
+    margin-left: 10px;
     height: 50px;
     width: 425px;
     margin-bottom: 15px;
     transition-duration: 0.2s;
+    border: 1px solid #eee;
 }
 
 .project-card-add-item-btn::before {
-    content: '+';
+    content: '+ Add new task';
+    font-size: 1.2rem;
+    margin-top: 11px;
     position: absolute;
     /* margin-top: 2px; */
     margin-left: 10px;
-    color: rgb(142, 142, 212);
-    animation-name: blink;
+    color: rgb(226, 226, 247);
+    /* animation-name: blink;
     animation-duration: 3s;
-    animation-iteration-count: infinite;
+    animation-iteration-count: infinite; */
 }
 
 @keyframes blink {
@@ -199,7 +204,7 @@ input {
 }
 
 .project-card-add-item-btn:hover {
-    background-color: rgb(165, 208, 243);
+    background-color: rgb(207, 227, 243);
 }
 
 #modal-calendar {
@@ -281,8 +286,9 @@ input {
 
 .item-card {
     display: flex;
-    justify-content: space-between;
-    align-items: center;
+    flex-direction: column;
+    /* justify-content: space-between;
+    align-items: center; */
     background-color: rgb(255, 255, 255);
     margin-right: 45px;
     margin-bottom: 15px;
@@ -310,6 +316,16 @@ input {
     /* animation-timing-function: ease; */
 }
 
+.item-card-top {
+    display: flex;
+    margin-bottom: 2px;
+}
+
+.item-card-bottom {
+    display: flex;
+    /* justify-content: flex-end; */
+    margin-top: 8px;
+}
 
 
 .item-card-left {
@@ -322,7 +338,7 @@ input {
 }
 
 .item-title {
-    font-weight: 600;
+    font-weight: 500;
     margin-top: 1px;
 }
 
@@ -369,6 +385,37 @@ input {
     text-decoration: line-through;
 }
 
+.item-card-flag {
+    background-color: rgb(255, 245, 234);
+    display: flex;
+    font-size: 0.8rem;
+    width: fit-content;
+    padding: 5px;
+    justify-self: right;
+    border-radius: 5px;
+    cursor: pointer;
+    border: 1px solid #eee;
+    transition-duration: .1s;
+}
+
+
+
+.item-card-flag:hover {
+    background-color: rgb(240, 231, 221);
+
+}
+
+.item-card-flag-icon {
+    margin-right: 2px;
+}
+
+#all-items-container {
+    display: flex;
+    flex-direction: column;
+    padding: 50px;
+    flex-wrap: wrap;
+    height: inherit;
+}
 
 
 #header {
@@ -394,7 +441,7 @@ nav {
     flex-direction: column;
     flex-wrap: wrap;
     height: 100%;
-background-color: inherit;
+    background-color: inherit;
 /* background-image: url("data:image/svg+xml,%3Csvg width='70' height='70' viewBox='0 0 70 70' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23323232' fill-opacity='0.4' fill-rule='evenodd'%3E%3Cpath d='M0 0h35v35H0V0zm5 5h25v25H5V5zm5 5h15v15H10V10zm5 5h5v5h-5v-5zM40 5h25v25H40V5zm5 5h15v15H45V10zm5 5h5v5h-5v-5zM70 35H35v35h35V35zm-5 5H40v25h25V40zm-5 5H45v15h15V45zm-5 5h-5v5h5v-5zM30 40H5v25h25V40zm-5 5H10v15h15V45zm-5 5h-5v5h5v-5z'/%3E%3C/g%3E%3C/svg%3E");    width: 20000px; */
 }
 

@@ -15,13 +15,13 @@ import priorityIcon from "../icons/exclamation.png"
 // Add 'number of days until due'
 // Organize all tasks by date, include project in this case
 // Remove task button does not work on completed tasks
-// Make item cards sleeker
-// Stats sidebar
 // Add task button not currently working on addproject button
 // Edit task
 // double-click project name to rename
 // New project modal - maybe just in the header
-
+// Seems like it may be worthwhile to track when it's in task mode
+// Item modals + project modal all need fine tuning - close options, appearing in the right places, etc.
+// When a task is completed in All tasks view, it should not render the project
 // IDEAS
 // Arrows pointing to certain tasks from the right - Alert! This task is due in 2 days! etc
 // Be able to tag projects by color
@@ -29,6 +29,9 @@ import priorityIcon from "../icons/exclamation.png"
 // Color blind mode
 // Be able to pin an item
 // Collapible todo categories
+// Stats sidebar
+// Sorting
+
 
 import {isAfter, format, getDay, parseISO, add} from 'date-fns';
 import { fi } from 'date-fns/locale';
@@ -130,6 +133,11 @@ function createItemCard(item) {
         itemCard.classList.add('item-card-complete')
     }
     
+    const content = document.createElement('div');
+    content.classList = 'item-card-top';
+    
+    content.appendChild(left);
+    content.appendChild(right);
     left.appendChild(itemCompleteBtn);
     left.appendChild(itemContentContainer);
     // right.appendChild(removeItemBtn);
@@ -137,10 +145,34 @@ function createItemCard(item) {
     itemContentContainer.appendChild(itemTitle);
     // itemContentContainer.appendChild(itemDueDate);
     // itemContentContainer.appendChild(itemPriority);
-    itemCard.appendChild(left);
-    itemCard.appendChild(right);
+    itemCard.appendChild(content);
 
     return itemCard;
+}
+
+function createItemCardFlag(item) {
+    const itemCard = createItemCard(item);
+    const bottom = document.createElement('div');
+    bottom.classList.add('item-card-bottom');
+    const flag = document.createElement('div');
+    flag.classList.add('item-card-flag');
+    const flagIcon = document.createElement('div')
+    flagIcon.textContent = `🏷️`;
+    flagIcon.classList.add('item-card-flag-icon');
+    const project = document.createElement('p');
+    project.textContent = item.project;
+    project.classList.add('item-card-flag-project')
+
+    flag.addEventListener('click', () => {
+        renderProject(getProject(item.project));
+    })
+    bottom.appendChild(flag);
+    itemCard.appendChild(bottom);
+    flag.appendChild(flagIcon);
+    flag.appendChild(project);
+    return itemCard;
+
+
 }
 
 function createProject(title) {
@@ -171,6 +203,7 @@ function createProjectCard(project) {
 
     addItemBtn.classList.add('project-card-add-item-btn');
     addItemBtn.classList.add('add-item-btn-active');
+    // addItemBtn.textContent = 'Add new task'
     // addItemBtn.textContent = '+';
     addItemBtn.addEventListener('click', () => {
         const addItemModal = document.getElementById('add-item-modal');
@@ -299,7 +332,6 @@ function createAppNav() {
     const right = document.createElement('div');
     right.id = 'header-right';
     right.classList.add('header-section');
-
 
     const loadDemoBtn = document.createElement('button');
     loadDemoBtn.classList.add('header-button');
@@ -913,6 +945,19 @@ function renderProject(project) {
     saveLocal();
 }
 
+function renderAllItems() {
+    const main = document.getElementById('main');
+    const itemContainer = document.createElement('div');
+    itemContainer.id = 'all-items-container';
+
+    resetPage();
+    for(let project of _projects){
+        project.items.map((item) => itemContainer.appendChild(createItemCardFlag(item)));
+    }
+    main.appendChild(itemContainer);
+    // updatePage();
+}
+
 // base
 
 function createAppContainer() {
@@ -996,23 +1041,24 @@ function createSidebarMenus() {
     taskMenu.id = 'sidebar-tasks-dropdown';
 
     const tasksAll = document.createElement('li');
-    tasksAll.classList.add('sidebar-tasks-menu-card');
+    tasksAll.classList.add('sidebar-tasks-dropdown-option');
     tasksAll.id = 'sidebar-tasks-all';
     tasksAll.innerHTML = `All tasks`
+    tasksAll.addEventListener('click', renderAllItems);
     const tasksDay = document.createElement('li');
-    tasksDay.classList.add('sidebar-tasks-menu-card');
+    tasksDay.classList.add('sidebar-tasks-dropdown-option');
     tasksDay.id = 'sidebar-tasks-within-day';
-    tasksDay.innerHTML = `Due within the <b>day</b>`
+    tasksDay.innerHTML = `Due within the <em>day</em>`
     const tasksWeek = document.createElement('li');
-    tasksWeek.classList.add('sidebar-tasks-menu-card');
+    tasksWeek.classList.add('sidebar-tasks-dropdown-option');
 
     tasksWeek.id = 'sidebar-tasks-within-week';
-    tasksWeek.innerHTML = `<p>Due within the <b>week</b>`
+    tasksWeek.innerHTML = `<p>Due within the <em>week</em>`
     const tasksMonth = document.createElement('li');
-    tasksMonth.classList.add('sidebar-tasks-menu-card');
+    tasksMonth.classList.add('sidebar-tasks-dropdown-option');
 
     tasksMonth.id = `sidebar-tasks-within-month`;
-    tasksMonth.innerHTML = `<p>Due within the <b>month</b>`
+    tasksMonth.innerHTML = `<p>Due within the <em>month</em>`
 
     taskMenu.appendChild(tasksAll);
     taskMenu.appendChild(tasksDay);
