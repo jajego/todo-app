@@ -39,6 +39,7 @@ html, body {
     height: 100%;
     background-color: #323232;
     background-color: #303030;
+    width: 100%;
     /* background-image: url("data:image/svg+xml,%3Csvg width='70' height='70' viewBox='0 0 70 70' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23323232' fill-opacity='0.4' fill-rule='evenodd'%3E%3Cpath d='M0 0h35v35H0V0zm5 5h25v25H5V5zm5 5h15v15H10V10zm5 5h5v5h-5v-5zM40 5h25v25H40V5zm5 5h15v15H45V10zm5 5h5v5h-5v-5zM70 35H35v35h35V35zm-5 5H40v25h25V40zm-5 5H45v15h15V45zm-5 5h-5v5h5v-5zM30 40H5v25h25V40zm-5 5H10v15h15V45zm-5 5h-5v5h5v-5z'/%3E%3C/g%3E%3C/svg%3E"); */
 
 }
@@ -87,9 +88,8 @@ input {
 .project-card {
     display: flex;
     flex-direction: column;
-    height: 500px;
+    height: 100%;
     width: auto;
-    
     margin: 10px;
     margin-top: 75px;
     padding: 25px;
@@ -123,9 +123,13 @@ input {
 }
 
 .project-item-card-container {
-    position: fixed;
+    display: flex;
+    flex-direction: column;
+    flex-wrap: wrap;
+    position: absolute;
     margin-top: 220px;
-    width: auto;
+    height: 75%;
+    /* width: 100%; */
 }
 
 .project-card-complete {
@@ -239,12 +243,13 @@ input {
     justify-content: space-between;
     align-items: center;
     background-color: rgb(70, 70, 70);
+    margin-right: 45px;
     margin-bottom: 15px;
     border: 2px solid rgb(68, 68, 68);
     padding: 15px;
     width: fit-content;
     /* padding-left: 0; */
-    /* border: 1px dotted rosybrown; */
+    border: 1px solid rgb(35, 40, 43);
     border-radius: 15px;
     box-shadow: -4px 4px rgb(238, 78, 78);
     transition: .1s;
@@ -294,7 +299,8 @@ input {
     gap: 5px;
 }
 .item-title {
-    font-size: 1.25rem;
+    font-size: 1.1rem;
+    max-width: 500px;
 }
 .item-description,
 .item-due-date,
@@ -305,6 +311,7 @@ input {
 .item-critical {
     background-color: rgb(241, 224, 224);
     color: rgb(75, 75, 75);
+    font-weight: 800;
 }
 
 .item-card-complete {

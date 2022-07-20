@@ -28,6 +28,7 @@ import priorityIcon from "../icons/exclamation.png"
 // Communicate priority by border around OR just color the circle differently
 // Color blind mode
 // Be able to pin an item
+// Collapible todo categories
 
 import {isAfter, format, getDay, parseISO, add} from 'date-fns';
 import { fi } from 'date-fns/locale';
@@ -39,6 +40,7 @@ class Item {
         this.priority = priority;
         this.project = project;
         this.isComplete = false;
+        this.completedDate;
     }
 }
 
@@ -117,7 +119,10 @@ function createItemCard(item) {
     });
 
     itemTitle.textContent = item.title;
+
+    if(item.dueDate !== ''){
     itemDueDate.textContent = `Due: ${item.dueDate}`;
+    }
     // itemPriority.textContent = `Priority: ${item.priority}`;
     
 
@@ -154,7 +159,6 @@ function createProjectCard(project) {
     // if(!project){
     //     project = createProject('Default');
     // }
-    console.log(`Project is ${project}`)
     projectCard.id = `project-${project.title}`;
     projectCard.classList.add('project-card');
     if(project.isComplete){
@@ -237,20 +241,22 @@ function completeProject(projectToComplete) {
 }
 
 function completeItem(itemToComplete) {
-    itemToComplete.isComplete = true;
     const project = getProject(itemToComplete.project);
     const indexOfItem = project.items.findIndex((item) => item.title === itemToComplete.title);
     const firstIndex = findFirstCompletedItem(project);
-    if(firstIndex && firstIndex !== 0){
-        project.items.splice(firstIndex, 0, itemToComplete)
-    } else {
-        project.items.push(project.items.splice(indexOfItem,1)[0])
-    }    
+    itemToComplete.isComplete = true;
+    itemToComplete.completedDate = new Date();
+    console.log(itemToComplete);
+  
+    console.log('push ittt');
+    project.items.push(project.items.splice(indexOfItem,1)[0])
+      
     updatePage();
 }
 
 function findFirstCompletedItem(project) {
     const firstCompleted = project.items.find((item) => item.isComplete);
+    console.log('Found first completed: ' + firstCompleted);
     if(!firstCompleted){
         return null;
     }
@@ -290,6 +296,12 @@ function createAppNav() {
         }
     })
 
+    const loadDemoBtn = document.createElement('button');
+    loadDemoBtn.classList.add('header-button');
+    loadDemoBtn.innerHTML = 'Load demo';
+    loadDemoBtn.addEventListener('click', loadDemo);
+    
+
     const clearLocalStorageBtn = document.createElement('button');
     clearLocalStorageBtn.classList.add('clear-local-storage-btn');
     clearLocalStorageBtn.innerHTML = 'Clear localStorage'
@@ -301,9 +313,143 @@ function createAppNav() {
     projectCardNav.appendChild(addProjectBtn);
     // projectCardNav.appendChild(addItemBtn);
     // projectCardNav.appendChild(editProjectTitleBtn);
+    projectCardNav.appendChild(loadDemoBtn);
     projectCardNav.appendChild(clearLocalStorageBtn)
 
     return projectCardNav;
+}
+
+
+
+function loadDemo() {
+    const proj1 = createProject('Housework');
+    proj1.addToItems(createItem('Check in with contractors about renovations', 
+                                format((add(new Date(), {weeks: 1})), "eee, " + "MMMM " + "dd"),
+                                'Medium',
+                                'Housework'));
+                                
+    proj1.addToItems(createItem('Clean out guestroom', 
+                                format((add(new Date(), {weeks: 4})), "eee, " + "MMMM " + "dd"),
+                                'Low',
+                                'Housework'));
+
+    
+    proj1.addToItems(createItem('Clean bathroom', 
+                                format((add(new Date(), {days: 4})), "eee, " + "MMMM " + "dd"),
+                                'High',
+                                'Housework'));
+
+    
+    proj1.addToItems(createItem('Dust and organize attic shelves', 
+                                '',
+                                'Low',
+                                'Housework'));
+                                
+    proj1.items.unshift(createItem('Get new belt for laundry machine', 
+                                format((add(new Date(), {days: 2})), "eee, " + "MMMM " + "dd"),
+                                'Critical',
+                                'Housework'));
+
+    const proj2 = createProject('Birdbot v2.0');
+    proj2.addToItems(createItem('Determine maximum number of API calls per day', 
+                                format((add(new Date(), {weeks: 1})), "eee, " + "MMMM " + "dd"),
+                                'High',
+                                'Birdbot v2.0'));
+
+        
+    proj2.addToItems(createItem('Research map interface options', 
+                                format((add(new Date(), {weeks: 4})), "eee, " + "MMMM " + "dd"),
+                                'Low',
+                                'Birdbot v2.0'));
+
+    proj2.addToItems(createItem('Come up with 5 potential names for the project', 
+                                format((add(new Date(), {months: 2, days: 5})), "eee, " + "MMMM " + "dd"),
+                                'Low',
+                                'Birdbot v2.0'));
+
+    proj2.addToItems(createItem('Figure out Wikipedia vs. Google for image scraping', 
+                                format((add(new Date(), {weeks: 4})), "eee, " + "MMMM " + "dd"),
+                                'Low',
+                                'Birdbot v2.0'));
+
+    proj2.addToItems(createItem('Ask some bird enthusiasts what they would want', 
+                                '',
+                                'Low',
+                                'Birdbot v2.0'));
+
+
+    proj2.addToItems(createItem('Determine maximum number of API calls per day', 
+                                format((add(new Date(), {weeks: 1})), "eee, " + "MMMM " + "dd"),
+                                'High',
+                                'Birdbot v2.0'));
+
+    
+    proj2.addToItems(createItem('Book consultation with UX connect', 
+                                format((add(new Date(), {weeks: 4})), "eee, " + "MMMM " + "dd"),
+                                'Low',
+                                'Birdbot v2.0'));
+
+    proj2.addToItems(createItem('Authentication?', 
+                                format((add(new Date(), {months: 2, days: 5})), "eee, " + "MMMM " + "dd"),
+                                'Low',
+                                'Birdbot v2.0'));
+
+        
+    proj2.items.unshift(createItem('Research map interface options', 
+                                format((add(new Date(), {weeks: 1})), "eee, " + "MMMM " + "dd"),
+                                'Critical',
+                                'Birdbot v2.0'));
+
+    proj2.addToItems(createItem('Design hats', 
+                                format((add(new Date(), {years: 1, months: 2, days: 5})), "eee, " + "MMMM " + "dd"),
+                                'Low',
+                                'Birdbot v2.0'));
+
+    proj2.addToItems(createItem('Hosting budget', 
+                                format((add(new Date(), {years: 1})), "eee, " + "MMMM " + "dd"),
+                                'High',
+                                'Birdbot v2.0'));
+
+        
+    proj2.addToItems(createItem('Figure out how long to retain calls to db - session?', 
+                                format((add(new Date(), {weeks: 4})), "eee, " + "MMMM " + "dd"),
+                                'Low',
+                                'Birdbot v2.0'));
+
+    proj2.addToItems(createItem('Contact Angela', 
+                                format((add(new Date(), {months: 2, days: 5})), "eee, " + "MMMM " + "dd"),
+                                'Low',
+                                'Birdbot v2.0'));
+
+    proj2.addToItems(createItem('Finalize branding direction', 
+                                format((add(new Date(), {weeks: 1})), "eee, " + "MMMM " + "dd"),
+                                'High',
+                                'Birdbot v2.0'));
+
+        
+    proj2.addToItems(createItem('See what else people have done with the eBird API', 
+                                format((add(new Date(), {weeks: 4})), "eee, " + "MMMM " + "dd"),
+                                'Low',
+                                'Birdbot v2.0'));
+
+    proj2.addToItems(createItem('Talk to Trevor about color schemes', 
+                                '',
+                                'Low',
+                                'Birdbot v2.0'));
+
+    proj2.items.unshift((createItem('Talk to some birds', 
+                                    '',
+                                    'Critical',
+                                    'Birdbot v2.0')));
+
+   
+        
+
+    
+                                
+
+    _projects = [proj1, proj2];
+    updatePage();
 }
 
 function resetPage() {
@@ -460,7 +606,6 @@ function createAddItemModal2() {
     submitBtn.type = 'submit';
     submitBtn.id = 'item-modal-submit-btn'
     submitBtn.innerText = 'Add task'
-    submitBtn.addEventListener('click', console.log(submitBtn.parentNode))
 
     const project = document.createElement('input');
     project.type = 'text';
@@ -916,10 +1061,8 @@ function initTodoApp() {
 const updateSidebarMenu = () => {
     const sidebarMenu = document.getElementById('sidebar-menus-container');
     if(sidebarMenu === null){
-        console.log('null god');
         return createSidebarMenus;
     } else {
-        console.log('Ill never take the null path')
         sidebarMenu.innerHTML = '';
         createSidebarMenus();
     }
