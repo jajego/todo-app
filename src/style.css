@@ -1,5 +1,5 @@
 * {
-    font-family: Arial, Helvetica, sans-serif;
+    font-family:system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
     margin: 0;
     padding: 0;
 }
@@ -12,7 +12,16 @@ html, body {
 #add-item-modal, 
 #add-project-modal {
     display: none;
+    margin-left: 11px;
+
+}
+
+#item-modal-submit-btn {
     padding: 10px;
+}
+
+#add-item-form-top {
+    height: auto;
 }
 
 #add-item-form-bottom {
@@ -26,6 +35,7 @@ html, body {
 #new-item-title {
     padding: 3px;
     width: 440px;
+    height: 30px;
 }
 
 
@@ -37,8 +47,7 @@ html, body {
     /* flex-direction: column; */
     min-height: 100%;
     height: 100%;
-    background-color: #323232;
-    background-color: #303030;
+    background-color: #fffde8;
     width: 100%;
     /* background-image: url("data:image/svg+xml,%3Csvg width='70' height='70' viewBox='0 0 70 70' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23323232' fill-opacity='0.4' fill-rule='evenodd'%3E%3Cpath d='M0 0h35v35H0V0zm5 5h25v25H5V5zm5 5h15v15H10V10zm5 5h5v5h-5v-5zM40 5h25v25H40V5zm5 5h15v15H45V10zm5 5h5v5h-5v-5zM70 35H35v35h35V35zm-5 5H40v25h25V40zm-5 5H45v15h15V45zm-5 5h-5v5h5v-5zM30 40H5v25h25V40zm-5 5H10v15h15V45zm-5 5h-5v5h5v-5z'/%3E%3C/g%3E%3C/svg%3E"); */
 
@@ -47,7 +56,7 @@ html, body {
 #sidebar {
     width: 225px;
     height: auto;
-    background-color: rgb(32, 32, 32);
+    background-color: rgb(255, 255, 255);
 
 }
 
@@ -56,11 +65,12 @@ html, body {
 }
 
 .collapsible {
-    background-color: rgb(32, 32, 32);
+    background-color: rgb(224, 224, 224);
     cursor: pointer;
     padding: 5px;
+    color:rgb(0, 0, 0);
     text-align: left;
-    color:rgb(228, 228, 228)
+    padding-left: 10px;
 
 }
 
@@ -68,11 +78,23 @@ html, body {
     background-color: #ccc;
 }
 
+
+
 #sidebar-projects-dropdown,
 #sidebar-tasks-dropdown {
     display: none;
     padding: 10px;
     list-style-type: none;
+}
+
+.sidebar-projects-dropdown-option {
+    font-size: 1.2rem;
+    text-align: right;
+    padding: 2px;
+}
+
+.sidebar-projects-dropdown-option-active {
+    font-weight: 800;
 }
 
 label {
@@ -91,7 +113,7 @@ input {
     height: 100%;
     width: auto;
     margin: 10px;
-    margin-top: 75px;
+    margin-top: 30px;
     padding: 25px;
     padding-top: 0;
     /* box-shadow: -4px 4px black;
@@ -112,7 +134,9 @@ input {
 }
 
 .project-card-title {
+    
     font-size: 4.0rem;
+    color:rgb(43, 43, 43)
 }
 
 
@@ -127,8 +151,9 @@ input {
     flex-direction: column;
     flex-wrap: wrap;
     position: absolute;
-    margin-top: 220px;
+    margin-top: 200px;
     height: 75%;
+    margin-left: 11px;
     /* width: 100%; */
 }
 
@@ -147,21 +172,34 @@ input {
     /* display: inline-block; */
     font-size: 2.5rem;
     color: lightgray;
-    background-color: rgb(53, 53, 53);
+    background-color: rgb(255, 255, 255);
     cursor: pointer;
-    height: 30px;
+    margin-left: 11px;
+    height: 50px;
     width: 425px;
     margin-bottom: 15px;
-    padding: 10px;
+    transition-duration: 0.2s;
 }
 
 .project-card-add-item-btn::before {
     content: '+';
     position: absolute;
+    /* margin-top: 2px; */
+    margin-left: 10px;
+    color: rgb(142, 142, 212);
+    animation-name: blink;
+    animation-duration: 3s;
+    animation-iteration-count: infinite;
+}
+
+@keyframes blink {
+    0% { opacity: 50; }
+    25% { opacity: 25 }
+    50% { opacity: 0 }
 }
 
 .project-card-add-item-btn:hover {
-    background-color: rgb(228, 228, 228);
+    background-color: rgb(165, 208, 243);
 }
 
 #modal-calendar {
@@ -191,18 +229,21 @@ input {
 
 #calendar-modal-calendar-btn,
 #priority-modal-priority-btn {
-    width: 30;
-    height: 30;
+    width: 20px;
+    height: 20px;
     font-size: 1.5rem;
     background-color: white;
+    border: 2px dotted rgb(87, 87, 87);
     display: flex;
-    padding: 5px;
+    padding: 10px;
     border-radius: 25px;
     justify-content: center;
     align-items: center;
-    box-shadow: -3px 3px pink;
+    box-shadow: -3px 4px rgb(253, 192, 255);
     transition-duration: 0.1s;
 }
+
+
 
 #calendar-modal-calendar-btn:hover, 
 #priority-modal-priority-btn:hover {
@@ -242,18 +283,19 @@ input {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    background-color: rgb(70, 70, 70);
+    background-color: rgb(255, 255, 255);
     margin-right: 45px;
     margin-bottom: 15px;
-    border: 2px solid rgb(68, 68, 68);
     padding: 15px;
     width: fit-content;
     /* padding-left: 0; */
-    border: 1px solid rgb(35, 40, 43);
+    border: 2px solid rgb(35, 40, 43);
     border-radius: 15px;
-    box-shadow: -4px 4px rgb(238, 78, 78);
-    transition: .1s;
-    color: white;
+    /* box-shadow: -4px 4px rgb(238, 78, 78); */
+    /* transition: .1s; */
+    color: rgb(73, 73, 73);
+    box-shadow: none;
+    transition-duration: 0.2s;
 }
 
 /* .item-card:after {
@@ -264,8 +306,10 @@ input {
 } */
 
 .item-card:hover {
-    box-shadow: none;
+    box-shadow: -4px 4px rgb(238, 78, 78);
+    /* animation-timing-function: ease; */
 }
+
 
 
 .item-card-left {
@@ -273,7 +317,13 @@ input {
     justify-content: flex-start;
     gap: 10px;
     align-items: center;
+    justify-content: center;
     margin-right: 20px;
+}
+
+.item-title {
+    font-weight: 600;
+    margin-top: 1px;
 }
 
 .item-card-right {
@@ -282,7 +332,7 @@ input {
     justify-content: flex-end;
     align-items: center;
     font-style: italic;
-    font-weight: bold;
+    /* font-weight: bold; */
     color: rgb(151, 151, 151);
 }
 
@@ -309,7 +359,7 @@ input {
 }
 
 .item-critical {
-    background-color: rgb(241, 224, 224);
+    background-color: rgb(235, 175, 175);
     color: rgb(75, 75, 75);
     font-weight: 800;
 }
@@ -344,7 +394,7 @@ nav {
     flex-direction: column;
     flex-wrap: wrap;
     height: 100%;
-background-color: #303030;
+background-color: inherit;
 /* background-image: url("data:image/svg+xml,%3Csvg width='70' height='70' viewBox='0 0 70 70' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23323232' fill-opacity='0.4' fill-rule='evenodd'%3E%3Cpath d='M0 0h35v35H0V0zm5 5h25v25H5V5zm5 5h15v15H10V10zm5 5h5v5h-5v-5zM40 5h25v25H40V5zm5 5h15v15H45V10zm5 5h5v5h-5v-5zM70 35H35v35h35V35zm-5 5H40v25h25V40zm-5 5H45v15h15V45zm-5 5h-5v5h5v-5zM30 40H5v25h25V40zm-5 5H10v15h15V45zm-5 5h-5v5h5v-5z'/%3E%3C/g%3E%3C/svg%3E");    width: 20000px; */
 }
 
@@ -397,7 +447,7 @@ button {
     color: #24292E;
     cursor: pointer;
     display: inline-block;
-    font-family: -apple-system, system-ui, "Segoe UI", Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji";
+    font-family:system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
     font-size: 14px;
     font-weight: 500;
     line-height: 20px;
@@ -423,7 +473,8 @@ button {
 .item-complete-btn {
     width: 15px;
     height: 15px;
-    background-color: rgb(43, 43, 43) ;
+    margin-top: 2px;
+    background-color: white;
     border-radius: 25%;
     cursor: pointer;
 }
@@ -441,15 +492,15 @@ button {
 } */
 
 .item-complete-btn-low {
-    border: 2px solid rgb(144, 238, 199);
+    border: 3px solid rgb(144, 238, 199);
 }
 
 .item-complete-btn-medium {
-    border: 2px solid rgb(238, 232, 144);
+    border: 3px solid rgb(238, 232, 144);
 }
 .item-complete-btn-high,
 .item-complete-btn-critical {
-    border: 2px solid rgb(238, 144, 144);
+    border: 3px solid rgb(238, 144, 144);
 }
 
 

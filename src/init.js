@@ -296,6 +296,11 @@ function createAppNav() {
         }
     })
 
+    const right = document.createElement('div');
+    right.id = 'header-right';
+    right.classList.add('header-section');
+
+
     const loadDemoBtn = document.createElement('button');
     loadDemoBtn.classList.add('header-button');
     loadDemoBtn.innerHTML = 'Load demo';
@@ -313,8 +318,10 @@ function createAppNav() {
     projectCardNav.appendChild(addProjectBtn);
     // projectCardNav.appendChild(addItemBtn);
     // projectCardNav.appendChild(editProjectTitleBtn);
-    projectCardNav.appendChild(loadDemoBtn);
-    projectCardNav.appendChild(clearLocalStorageBtn)
+    right.appendChild(loadDemoBtn);
+    right.appendChild(clearLocalStorageBtn);
+    projectCardNav.appendChild(right);
+   
 
     return projectCardNav;
 }
@@ -357,14 +364,14 @@ function loadDemo() {
                                 'Birdbot v2.0'));
 
         
-    proj2.addToItems(createItem('Research map interface options', 
-                                format((add(new Date(), {weeks: 4})), "eee, " + "MMMM " + "dd"),
-                                'Low',
+    proj2.items.unshift(createItem('Start learning React', 
+                                '',
+                                'Critical',
                                 'Birdbot v2.0'));
 
     proj2.addToItems(createItem('Come up with 5 potential names for the project', 
                                 format((add(new Date(), {months: 2, days: 5})), "eee, " + "MMMM " + "dd"),
-                                'Low',
+                                'Medium',
                                 'Birdbot v2.0'));
 
     proj2.addToItems(createItem('Figure out Wikipedia vs. Google for image scraping', 
@@ -374,7 +381,7 @@ function loadDemo() {
 
     proj2.addToItems(createItem('Ask some bird enthusiasts what they would want', 
                                 '',
-                                'Low',
+                                'Medium',
                                 'Birdbot v2.0'));
 
 
@@ -957,7 +964,9 @@ function createSidebarMenus() {
         projOption.classList.add('sidebar-projects-dropdown-option');
         projOption.id = project.title;
         projOption.textContent = project.title;
-        projOption.addEventListener('click', () => {
+        projOption.addEventListener('click', (e) => {
+            e.target.parentNode.childNodes.forEach((node) => node.classList.remove('sidebar-projects-dropdown-option-active'));
+            projOption.classList.add('sidebar-projects-dropdown-option-active');
             renderProject(project);
             // Add class that makes option bold when selected
         })
