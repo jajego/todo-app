@@ -111,7 +111,7 @@ input {
     display: flex;
     flex-direction: column;
     height: 100%;
-    width: auto;
+    width: 100%;
     margin: 10px;
     margin-top: 30px;
     padding: 25px;
@@ -124,9 +124,10 @@ input {
 
 .project-card-header {
     display: flex;
+    flex-direction: column;
     justify-content: flex-start;
-    align-items: center;
-    width: 1000px;
+    /* align-items: flex-end; */
+    width: 100%;
     margin-left: 8px;
     margin-bottom: 15px;
     color: white;
@@ -135,32 +136,36 @@ input {
 }
 
 .project-card-project-label {
-    font-size: 4.0rem;
+    font-size: 2.5rem;
     font-weight: 200;
     color: rgb(79, 79, 79);
+    font-style: italic;
+    font-stretch: semi-condensed;
     margin-right: 10px;
 }
 
 .project-card-title {
     font-size: 4.0rem;
-    color:rgb(43, 43, 43)
-}
-
-.project-card-title::before {
+    font-weight: 500;
+    color:rgb(43, 43, 43);
 }
 
 
 #rename-title-form {
     display: flex;
     align-items: center;
+    width: auto;
+    box-sizing: border-box;
 
 }
 #rename-title-input {
     font-size: 4.0rem;
-    font-weight: 700;
-    height: auto;
-    width: fit-content;
-
+    font-weight: 500;
+    height: 70px;
+    width: auto;
+    margin-bottom: 1px;
+  
+    
 }
 
 
@@ -175,9 +180,10 @@ input {
     flex-direction: column;
     flex-wrap: wrap;
     position: absolute;
-    margin-top: 200px;
+    margin-top: 260px;
     height: 75%;
     margin-left: 11px;
+    width: 100%;
     /* width: 100%; */
 }
 
@@ -189,6 +195,7 @@ input {
 .project-card-title {
     display: inline-block;
     width: 75%;
+    height: auto;
 }
 
 .project-card-add-item-btn {

@@ -22,6 +22,8 @@ import priorityIcon from "../icons/exclamation.png"
 // Seems like it may be worthwhile to track when it's in task mode
 // Item modals + project modal all need fine tuning - close options, appearing in the right places, etc.
 // When a task is completed in All tasks view, it should not render the project
+// Be able to click out of rename title form to submit it
+// Absolute positioning isn't working with px values as it depends on monitor
 
 // IDEAS
 // Arrows pointing to certain tasks from the right - Alert! This task is due in 2 days! etc
@@ -236,13 +238,19 @@ function createProjectCard(project) {
     projectCardTitle.textContent = `${project.title}`;
 
     projectCardTitle.addEventListener('dblclick', () => {
+        // Form is created on dblclick - could write with own function
         const renameTitleForm = document.createElement('form');
         renameTitleForm.id = 'rename-title-form';
-
-
         const renameTitleInput = document.createElement('input');
         renameTitleInput.id = 'rename-title-input';
         renameTitleInput.value = project.title;
+        renameTitleInput.autofocus = true;
+        setWidthFromChars(renameTitleInput);
+        
+        // renameTitleInput.addEventListener('keypress', (e) => {
+        //     renameTitleInput.style.width = `${e.target.value.length}ch`
+        // });
+
         projectCardTitle.style.display = 'none';
         renameTitleForm.appendChild(renameTitleInput)
         projectCardHeader.appendChild(renameTitleForm);
@@ -253,16 +261,20 @@ function createProjectCard(project) {
             getProject(project.title).title = newName;
             renderProject(getProject(project.title));
             updateSidebarMenu();
+        
         });
+
+        // Allows user to click item-card-container to submit teh name name instead of enter
+        const container = document.getElementsByClassName('project-item-card-container')
+        container[0].addEventListener('click', (e) => {
+            console.log('sent');
+            const newName = renameTitleInput.value;
+            getProject(project.title).title = newName;
+            renderProject(getProject(project.title));
+            updateSidebarMenu();
+        }, {once: true});
         
     })
-
-    // const completeBtn = document.createElement('button');
-    // completeBtn.classList.add('complete-project-button');
-    // completeBtn.innerText = 'O';
-    // completeBtn.addEventListener('click', () => {
-    //     completeProject(project);
-    // })
 
     // const delBtn = document.createElement('button');
     // delBtn.classList.add('delete-project-btn');
@@ -1158,6 +1170,12 @@ const updateSidebarMenu = () => {
         createSidebarMenus();
     }
 }
+
+function setWidthFromChars(input){
+    return input.style.width = (input.value.length-0.5) + 'ch';
+}
+
+
 
 const updatePage = () => {
     saveLocal();
