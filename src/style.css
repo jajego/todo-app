@@ -16,9 +16,7 @@ html, body {
 
 }
 
-#item-modal-submit-btn {
-    padding: 10px;
-}
+
 
 #add-item-form-top {
     height: auto;
@@ -26,14 +24,14 @@ html, body {
 
 #add-item-form-bottom {
     display: flex;
-    width: 450px;
+    width: 465px;
     margin-top: 10px;
     justify-content: right;
     gap: 5px;
 }
 
 #new-item-title {
-    padding: 3px;
+    padding: 10px;
     width: 440px;
     height: 30px;
 }
@@ -127,6 +125,7 @@ input {
 .project-card-header {
     display: flex;
     justify-content: flex-start;
+    align-items: center;
     width: 1000px;
     margin-left: 8px;
     margin-bottom: 15px;
@@ -135,10 +134,33 @@ input {
 
 }
 
+.project-card-project-label {
+    font-size: 4.0rem;
+    font-weight: 200;
+    color: rgb(79, 79, 79);
+    margin-right: 10px;
+}
+
 .project-card-title {
-    
     font-size: 4.0rem;
     color:rgb(43, 43, 43)
+}
+
+.project-card-title::before {
+}
+
+
+#rename-title-form {
+    display: flex;
+    align-items: center;
+
+}
+#rename-title-input {
+    font-size: 4.0rem;
+    font-weight: 700;
+    height: auto;
+    width: fit-content;
+
 }
 
 
@@ -223,18 +245,28 @@ input {
 .priority-modal-active {
     position: absolute;
     background-color: rgb(255, 255, 255);
-    border: 3px solid rgb(67, 136, 84);
+    border: 2px solid rgb(75, 75, 75);
     padding: 10px;
     border-radius: 15px;
-    margin-left: 102px;
-    margin-top: 110px;
+    margin-left: 475px;
+    margin-top: 10px;
+    animation-name: appear;
+    animation-duration: 0.2s;
+    /* animation-name: growFromBottom;
+    animation-duration: 1s; */
 }
+
+@keyframes appear {
+    0% { opacity: 0; }
+    100% { opacity: 100%; }
+}
+
 
 
 
 #calendar-modal-calendar-btn,
 #priority-modal-priority-btn {
-    width: 20px;
+    width: 30px;
     height: 20px;
     font-size: 1.5rem;
     background-color: white;
@@ -244,16 +276,25 @@ input {
     border-radius: 25px;
     justify-content: center;
     align-items: center;
-    box-shadow: -3px 4px rgb(253, 192, 255);
-    transition-duration: 0.1s;
+    /* box-shadow: -3px 4px rgb(253, 192, 255); */
+    transition-duration: .2s;
 }
 
 
 
 #calendar-modal-calendar-btn:hover, 
 #priority-modal-priority-btn:hover {
-    scale: 1.1;
+    background-color: rgb(248, 210, 255);
+    transform: scale(1.05);
 }
+
+#item-modal-submit-btn {
+    padding: 10px;
+    border: 2px solid rgb(87, 87, 87);
+    border-radius: 20px;
+}
+
+
 
 #priority-modal {
     display: none;
@@ -261,23 +302,30 @@ input {
 
 #calendar-form {
     display: flex;
-    /* flex-direction: column; */
+    flex-direction: column;
     justify-content: center;
     align-items: center;
-    height: 30px;
-    width: auto;
+    height: 175px;
+    width: 130px;
     /* width: auto; */
     gap: 5px;
 }
 
+#calendar-form::before {
+    content: 'Due:';
+    font-style: italic;
+}
+
 #calendar-modal-btn-container {
     display: flex;
-    /* flex-direction: column; */
+    flex-direction: column;
     gap: 2px;
 }
 
 #calendar-modal-btn-container > button {
     width: auto;
+    
+    font-size: 0.75rem;
 }
 
 .modal-button {
@@ -421,7 +469,7 @@ input {
 #header {
     padding: 10px;
     height: 50px;
-    background-color: rgb(12, 18, 25);
+    background-color: rgb(28, 41, 58);
     display: flex;
     align-items: center;   
 }
@@ -510,6 +558,8 @@ button {
     word-wrap: break-word;
 }
 
+
+
 .delete-project-btn {
 }
 
@@ -589,3 +639,4 @@ button {
 .no-display {
     display: none;
 }
+

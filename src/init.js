@@ -22,6 +22,7 @@ import priorityIcon from "../icons/exclamation.png"
 // Seems like it may be worthwhile to track when it's in task mode
 // Item modals + project modal all need fine tuning - close options, appearing in the right places, etc.
 // When a task is completed in All tasks view, it should not render the project
+
 // IDEAS
 // Arrows pointing to certain tasks from the right - Alert! This task is due in 2 days! etc
 // Be able to tag projects by color
@@ -65,25 +66,31 @@ class Project {
     getItem(item) {
         return this.items.find((listItem) => listItem.title === item.title)
     }
+
+    rename(newTitle){
+        return this.title = newTitle;
+    }
 }
 
 let _projects = [];
 let _lastOpenedProject;
+// _currView will either be 'Project' or 'Tasks'
+let _currView = 'project';
 
 function createItem(title, dueDate, priority, project) {
     return new Item(title, dueDate, priority, project)
 }
 
 function createItemCard(item) {
-    const itemCard = document.createElement('div');
+    const itemCard             = document.createElement('div');
     const itemContentContainer = document.createElement('div');
-    const left = document.createElement('div');
-    const itemCompleteBtn = document.createElement('div');
-    const itemTitle = document.createElement('h4');
-    const itemDueDate = document.createElement('p')
-    const itemPriority = document.createElement('p')
-    const right = document.createElement('div');
-    const removeItemBtn = document.createElement('div');
+    const left                 = document.createElement('div');
+    const right                = document.createElement('div');
+    const itemCompleteBtn      = document.createElement('div');
+    const itemTitle            = document.createElement('h4');
+    const itemDueDate          = document.createElement('p')
+    const itemPriority         = document.createElement('p')
+    const removeItemBtn        = document.createElement('div');
 
     itemCard.classList.add('item-card')
     if(item.priority === 'Critical'){
@@ -221,9 +228,34 @@ function createProjectCard(project) {
         }
     })
     // addItemBtn.addEventListener('click', openAddItemModal);
+    const projectLabel = document.createElement('div');
+    projectLabel.classList.add('project-card-project-label');
+    projectLabel.textContent = 'Project: '
     const projectCardTitle = document.createElement('h1');
     projectCardTitle.classList.add('project-card-title');
     projectCardTitle.textContent = `${project.title}`;
+
+    projectCardTitle.addEventListener('dblclick', () => {
+        const renameTitleForm = document.createElement('form');
+        renameTitleForm.id = 'rename-title-form';
+
+
+        const renameTitleInput = document.createElement('input');
+        renameTitleInput.id = 'rename-title-input';
+        renameTitleInput.value = project.title;
+        projectCardTitle.style.display = 'none';
+        renameTitleForm.appendChild(renameTitleInput)
+        projectCardHeader.appendChild(renameTitleForm);
+
+        renameTitleForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const newName = renameTitleInput.value;
+            getProject(project.title).title = newName;
+            renderProject(getProject(project.title));
+            updateSidebarMenu();
+        });
+        
+    })
 
     // const completeBtn = document.createElement('button');
     // completeBtn.classList.add('complete-project-button');
@@ -240,7 +272,7 @@ function createProjectCard(project) {
     //     removeProject(project);
     //     updatePage();
     // })
-   
+    projectCardHeader.appendChild(projectLabel);
     projectCardHeader.appendChild(projectCardTitle);
     // btnContainer.appendChild(completeBtn);
     // btnContainer.appendChild(delBtn);
@@ -563,9 +595,9 @@ function createAddItemModal2() {
     itemTitleInput.name      = 'itemTitle';
     itemTitleInput.placeholder = `To do`
 
-    const calendarModal = createCalendarModal();
-    calendarModal.id = 'calendar-modal';
-    addItemModal.appendChild(calendarModal);
+    // const calendarModal = createCalendarModal();
+    // calendarModal.id = 'calendar-modal';
+    // addItemModal.appendChild(calendarModal);
 
 
     const calendarBtn = document.createElement('div');
@@ -579,6 +611,7 @@ function createAddItemModal2() {
     calendarBtn.classList.add('modal-button')
     calendarBtn.id = 'calendar-modal-calendar-btn';
     calendarBtn.addEventListener('click', () => {
+        const calendarModal = document.getElementById('calendar-modal');
         calendarModal.classList.toggle('calendar-modal-active');
         if(calendarModal.style.display === 'block'){
             calendarModal.style.display = 'none';
@@ -935,8 +968,10 @@ function renderProject(project) {
     //     project = createProject('Default');
     // }
     if(!project){
-        project = createProject('Default');
-        _projects.push(project);
+        const main = document.getElementById('main');
+        const placeholder = document.createElement('div');
+        placeholder.textContent = 'Currently no projects';
+        return main.appendChild(placeholder);
     }
     _lastOpenedProject = project.title;
 
@@ -1109,6 +1144,7 @@ function initTodoApp() {
     restoreLocal();
     createSidebarMenus();
     document.body.appendChild(createFooter());
+    content.appendChild(createCalendarModal());
 
 
 }
