@@ -325,7 +325,6 @@ function completeItem(itemToComplete) {
     itemToComplete.completedDate = new Date();
     console.log(itemToComplete);
   
-    console.log('push ittt');
     project.items.push(project.items.splice(indexOfItem,1)[0])
       
     updatePage();
@@ -533,6 +532,9 @@ function loadDemo() {
 
     _projects = [proj1, proj2];
     updatePage();
+    renderProject(proj1);
+    makeProjectBold();
+
 }
 
 function resetPage() {
@@ -1023,6 +1025,18 @@ function createSidebar() {
     return sidebar;
 }
 
+function makeProjectBold(){
+    const projects = document.getElementsByClassName('sidebar-projects-dropdown-option');
+    for(let i = 0; i < projects.length; i++){
+        projects[i].classList.remove('sidebar-projects-dropdown-option-active');
+        console.log(projects[i]);
+        if(projects[i].innerHTML == _lastOpenedProject){
+            console.log('Last open');
+            projects[i].classList.add('sidebar-projects-dropdown-option-active')
+        }
+    }
+}
+
 function createSidebarMenus() {
     const sidebar = document.getElementById('sidebar');
     sidebar.innerHTML = '';
@@ -1038,10 +1052,10 @@ function createSidebarMenus() {
         e.target.classList.toggle('sidebar-menu-active');
         console.log(e.target);
         const projects = e.target.nextElementSibling;
-        if(projects.style.display === 'block') {
-            projects.style.display = 'none';
+        if(projects.style.display === 'none') {
+            projects.style.display = 'flex';
         } else {
-            projects.style.display = 'block';
+            projects.style.display = 'none';
         }
     })
 
@@ -1057,9 +1071,9 @@ function createSidebarMenus() {
         projOption.id = project.title;
         projOption.textContent = project.title;
         projOption.addEventListener('click', (e) => {
-            e.target.parentNode.childNodes.forEach((node) => node.classList.remove('sidebar-projects-dropdown-option-active'));
-            projOption.classList.add('sidebar-projects-dropdown-option-active');
+            // projOption.classList.toggle('sidebar-projects-dropdown-option-active');
             renderProject(project);
+            makeProjectBold();
             // Add class that makes option bold when selected
         })
 
@@ -1076,10 +1090,10 @@ function createSidebarMenus() {
         e.target.classList.toggle('sidebar-menu-active');
         console.log(e.target);
         const tasks = e.target.nextElementSibling;
-        if(tasks.style.display === 'block') {
+        if(tasks.style.display === 'flex') {
             tasks.style.display = 'none';
         } else {
-            tasks.style.display = 'block';
+            tasks.style.display = 'flex';
         }
     })
 
@@ -1114,6 +1128,8 @@ function createSidebarMenus() {
 
     menuContainer.appendChild(taskMenu);
     sidebar.appendChild(menuContainer);
+
+    makeProjectBold();
 }
 
 function createHeader() {

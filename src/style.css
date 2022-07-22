@@ -58,6 +58,8 @@ html, body {
 
 }
 
+
+
 .menu-title {
     font-size: 1.5rem;
 }
@@ -72,6 +74,8 @@ html, body {
 
 }
 
+.sidebar-menu-active 
+
 .sidebar-menu-active, .collapsible:hover {
     background-color: #ccc;
 }
@@ -80,16 +84,26 @@ html, body {
 
 #sidebar-projects-dropdown,
 #sidebar-tasks-dropdown {
-    display: none;
+    /* display: none; */
+    display: flex;
+    flex-direction: column;
+    /* justify-content:center; */
+    align-items: flex-end;
     padding: 10px;
     list-style-type: none;
+}
+
+#sidebar-tasks-dropdown {
+    display: none;
 }
 
 .sidebar-projects-dropdown-option,
 .sidebar-tasks-dropdown-option {
     font-size: 1.2rem;
-    text-align: right;
+    /* text-align: right; */
     padding: 2px;
+    cursor: pointer;
+    width: fit-content;
 }
 
 .sidebar-projects-dropdown-option-active {
@@ -179,8 +193,8 @@ input {
     display: flex;
     flex-direction: column;
     flex-wrap: wrap;
-    position: absolute;
-    margin-top: 260px;
+    /* position: absolute; */
+    margin-top: 25px;
     height: 75%;
     margin-left: 11px;
     width: 100%;
