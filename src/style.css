@@ -692,6 +692,7 @@ button {
     background-color: white;
     border-radius: 25%;
     cursor: pointer;
+    border: 3px solid rgb(144, 238, 199);
 }
 
 /* .item-complete-btn::before {
