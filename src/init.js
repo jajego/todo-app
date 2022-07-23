@@ -98,6 +98,7 @@ function createItemCard(item) {
     const itemDueDate          = document.createElement('p')
     const itemPriority         = document.createElement('p')
     const removeItemBtn        = document.createElement('div');
+    
 
     itemCard.classList.add('item-card')
     if(item.priority === 'Critical'){
@@ -137,9 +138,6 @@ function createItemCard(item) {
 
     itemTitle.textContent = item.title;
 
-    if(item.dueDate !== ''){
-    itemDueDate.textContent = `Due: ${item.dueDate}`;
-    }
     // itemPriority.textContent = `Priority: ${item.priority}`;
     
 
@@ -161,6 +159,11 @@ function createItemCard(item) {
     // itemContentContainer.appendChild(itemPriority);
     itemCard.appendChild(content);
 
+    
+    if(item.dueDate !== ''){
+        // itemDueDate.textContent = `Due: ${item.dueDate}`;
+        itemCard.appendChild(createDateFlag(item));
+    }
     return itemCard;
 }
 
@@ -185,9 +188,19 @@ function createItemCardFlag(item) {
     flag.appendChild(flagIcon);
     flag.appendChild(project);
     return itemCard;
-
-
 }
+
+function createDateFlag(item) {
+    const flagContainer = document.createElement('div');
+    flagContainer.classList.add('due-flag-container');
+    const flag = document.createElement('div');
+    const dueDate = item.dueDate;
+    flag.classList.add('due-flag');
+    flag.textContent = `⏰ ${dueDate}`
+    flagContainer.appendChild(flag);
+    return flagContainer;
+}
+
 
 function createProject(title, color) {
     let project = new Project(title, color);
@@ -422,18 +435,18 @@ function createAppNav() {
 function loadDemo() {
     const proj1 = createProject('Housework', 'blue');
     proj1.addToItems(createItem('Check in with contractors about renovations', 
-                                format((add(new Date(), {weeks: 1})), "eee, " + "MMMM " + "dd"),
+                                format((add(new Date(), {weeks: 1})), "eee, " + "MMM " + "do"),
                                 'Medium',
                                 'Housework'));
                                 
     proj1.addToItems(createItem('Clean out guestroom', 
-                                format((add(new Date(), {weeks: 4})), "eee, " + "MMMM " + "dd"),
+                                format((add(new Date(), {weeks: 4})), "eee, " + "MMM " + "do"),
                                 'Low',
                                 'Housework'));
 
     
     proj1.addToItems(createItem('Clean bathroom', 
-                                format((add(new Date(), {days: 4})), "eee, " + "MMMM " + "dd"),
+                                format((add(new Date(), {days: 4})), "eee, " + "MMM " + "do"),
                                 'High',
                                 'Housework'));
 
@@ -444,7 +457,7 @@ function loadDemo() {
                                 'Housework'));
                                 
     proj1.items.unshift(createItem('Get new belt for laundry machine', 
-                                format((add(new Date(), {days: 2})), "eee, " + "MMMM " + "dd"),
+                                format((add(new Date(), {days: 2})), "eee, " + "MMM " + "do "),
                                 'Critical',
                                 'Housework'));
 
@@ -457,12 +470,12 @@ function loadDemo() {
                                 'Birdbot v2.0'));
 
     proj2.addToItems(createItem('Come up with 5 potential names for the project', 
-                                format((add(new Date(), {months: 2, days: 5})), "eee, " + "MMMM " + "dd"),
+                                format((add(new Date(), {months: 2, days: 5})), "eee, " + "MMM " + "do"),
                                 'Medium',
                                 'Birdbot v2.0'));
 
     proj2.addToItems(createItem('Figure out Wikipedia vs. Google for image scraping', 
-                                format((add(new Date(), {weeks: 4})), "eee, " + "MMMM " + "dd"),
+                                format((add(new Date(), {weeks: 4})), "eee, " + "MMM " + "do"),
                                 'Low',
                                 'Birdbot v2.0'));
 
@@ -473,56 +486,56 @@ function loadDemo() {
 
 
     proj2.addToItems(createItem('Determine maximum number of API calls per day', 
-                                format((add(new Date(), {weeks: 1})), "eee, " + "MMMM " + "dd"),
+                                format((add(new Date(), {weeks: 1})), "eee, " + "MMM " + "do"),
                                 'High',
                                 'Birdbot v2.0'));
 
     
     proj2.addToItems(createItem('Book consultation with UX connect', 
-                                format((add(new Date(), {weeks: 4})), "eee, " + "MMMM " + "dd"),
+                                format((add(new Date(), {weeks: 4})), "eee, " + "MMM " + "do"),
                                 'Low',
                                 'Birdbot v2.0'));
 
     proj2.addToItems(createItem('Authentication?', 
-                                format((add(new Date(), {months: 2, days: 5})), "eee, " + "MMMM " + "dd"),
+                                format((add(new Date(), {months: 2, days: 5})), "eee, " + "MMM " + "do"),
                                 'Low',
                                 'Birdbot v2.0'));
 
         
     proj2.items.unshift(createItem('Research map interface options', 
-                                format((add(new Date(), {weeks: 1})), "eee, " + "MMMM " + "dd"),
+                                format((add(new Date(), {weeks: 1})), "eee, " + "MMM " + "do"),
                                 'Critical',
                                 'Birdbot v2.0'));
 
     proj2.addToItems(createItem('Design hats', 
-                                format((add(new Date(), {years: 1, months: 2, days: 5})), "eee, " + "MMMM " + "dd"),
+                                format((add(new Date(), {years: 1, months: 2, days: 5})), "eee, " + "MMM " + "do"),
                                 'Low',
                                 'Birdbot v2.0'));
 
     proj2.addToItems(createItem('Hosting budget', 
-                                format((add(new Date(), {years: 1})), "eee, " + "MMMM " + "dd"),
+                                format((add(new Date(), {years: 1})), "eee, " + "MMM " + "do"),
                                 'High',
                                 'Birdbot v2.0'));
 
         
     proj2.addToItems(createItem('Figure out how long to retain calls to db - session?', 
-                                format((add(new Date(), {weeks: 4})), "eee, " + "MMMM " + "dd"),
+                                format((add(new Date(), {weeks: 4})), "eee, " + "MMM " + "do"),
                                 'Low',
                                 'Birdbot v2.0'));
 
     proj2.addToItems(createItem('Contact Angela', 
-                                format((add(new Date(), {months: 2, days: 5})), "eee, " + "MMMM " + "dd"),
+                                format((add(new Date(), {months: 2, days: 5})), "eee, " + "MMM " + "do"),
                                 'Low',
                                 'Birdbot v2.0'));
 
     proj2.addToItems(createItem('Finalize branding direction', 
-                                format((add(new Date(), {weeks: 1})), "eee, " + "MMMM " + "dd"),
+                                format((add(new Date(), {weeks: 1})), "eee, " + "MMM " + "do"),
                                 'High',
                                 'Birdbot v2.0'));
 
         
     proj2.addToItems(createItem('See what else people have done with the eBird API', 
-                                format((add(new Date(), {weeks: 4})), "eee, " + "MMMM " + "dd"),
+                                format((add(new Date(), {weeks: 4})), "eee, " + "MMM " + "do"),
                                 'Low',
                                 'Birdbot v2.0'));
 
@@ -854,7 +867,7 @@ function processItemFormData() {
     console.log('-----------------')
     console.log(dueDate)
     if(dueDate){
-        dueDate = format(parseISO(dueDate), ("eee, " + "MMMM " + "dd"));
+        dueDate = format(parseISO(dueDate), ("eee, " + "MMM " + "dd"));
     }
     const priority = document.getElementById('priority-modal-input').value
     const project  = document.getElementById('selectProject').value
@@ -865,7 +878,7 @@ function processItemFormData() {
 function processCalendarFormData() {
     const date = document.getElementById('modal-calendar').value;
     // if(date) {
-    //     date = format(parseISO(dueDate), ("eee, " + "MMMM " + "dd"));
+    //     date = format(parseISO(dueDate), ("eee, " + "MMM " + "dd"));
     // }
     return date;
 }

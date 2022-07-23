@@ -593,7 +593,13 @@ input {
     animation-duration: 0.2s; */
 }
 
-.item-card-flag {
+.due-flag-container {
+    width: 100%;
+    display: flex;
+}
+
+.item-card-flag,
+.due-flag {
     background-color: rgb(255, 245, 234);
     display: flex;
     font-size: 0.8rem;
@@ -604,11 +610,13 @@ input {
     cursor: pointer;
     border: 1px solid #eee;
     transition-duration: .1s;
+    margin-top: 10px;
 }
 
 
 
-.item-card-flag:hover {
+.item-card-flag:hover,
+.due-flag:hover {
     background-color: rgb(240, 231, 221);
 
 }
