@@ -363,17 +363,28 @@ input {
 
 #modal-calendar {
     width: auto;
-    font-size: 0.9rem;
+    font-size: 0.8rem;
     /* color: lightgray; */
     width: 105px;
     border-radius: 15px;
+    margin-top: 5px;
 }
 
 #calendar-modal {
     display: none;
+    position: absolute;
+    background-color: rgb(255, 255, 255);
+    border: 2px solid rgb(75, 75, 75);
+    padding: 10px;
+    border-radius: 15px;
+    margin-left: 420px;
+    margin-top: 95px;
+    animation-name: appear;
+    animation-duration: 0.2s;
 }
 
-.calendar-modal-active,
+
+/* .calendar-modal-active, */
 .priority-modal-active {
     position: absolute;
     background-color: rgb(255, 255, 255);
@@ -381,7 +392,7 @@ input {
     padding: 10px;
     border-radius: 15px;
     margin-left: 475px;
-    margin-top: 10px;
+    margin-top: 40px;
     animation-name: appear;
     animation-duration: 0.2s;
     /* animation-name: growFromBottom;
@@ -437,21 +448,27 @@ input {
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    height: 175px;
-    width: 130px;
+    height: 120px;
+    width: 250px;
     /* width: auto; */
     gap: 5px;
 }
 
 #calendar-form::before {
     content: 'Due:';
+    color: black;
+    background-color: #eee;
+    padding: 3px;
+    padding-left: 10px;
+    padding-right: 10px;
+    border-radius: 5px;
     font-style: italic;
 }
 
 #calendar-modal-btn-container {
     display: flex;
-    flex-direction: column;
-    gap: 2px;
+    /* flex-direction: column; */
+    gap: 5px;
 }
 
 #calendar-modal-btn-container > button {

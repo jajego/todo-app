@@ -622,21 +622,12 @@ function createAddItemModal2() {
     formTop.id = 'add-item-form-top';
     const formBottom = document.createElement('div');
     formBottom.id = 'add-item-form-bottom';
-
-
-
-    // const project = e.target.parentNode.id;
    
     const itemTitleInput     = document.createElement('input');
     itemTitleInput.type      = 'text';
     itemTitleInput.id        = 'new-item-title';
     itemTitleInput.name      = 'itemTitle';
     itemTitleInput.placeholder = `To do`
-
-    // const calendarModal = createCalendarModal();
-    // calendarModal.id = 'calendar-modal';
-    // addItemModal.appendChild(calendarModal);
-
 
     const calendarBtn = document.createElement('div');
     const calendarImg = document.createElement('img');
@@ -657,22 +648,8 @@ function createAddItemModal2() {
             calendarModal.style.display = 'block';
         }
     })
-    // calendarBtn.addEventListener('mouseover', () => {
-    //     calendarModal.classList.toggle('calendar-modal-active');
-    //     if(calendarModal.style.display === 'block'){
-    //         calendarModal.style.display = 'none';
-    //     } else {
-    //         calendarModal.style.display = 'block';
-    //     }
-    // })
-
-    // itemDueDateInput.type      = 'date';
-    // itemDueDateInput.id        = 'new-item-duedate';
-    // itemDueDateInput.name      = 'itemDueDate';
     const priorityModal = createPriorityModal();
     addItemModal.appendChild(priorityModal);
-
-
 
     const priorityBtn = document.createElement('div');
     priorityBtn.classList.add('modal-button')
@@ -692,26 +669,6 @@ function createAddItemModal2() {
         }
     })
 
-    // const dropdownPriority = document.createElement('select');
-    // dropdownPriority.id = 'selectPriority';
-    // const lowPriority = document.createElement('option');
-    // lowPriority.value = 'Low';
-    // lowPriority.innerText = 'Low';
-    // const mediumPriority = document.createElement('option');
-    // mediumPriority.value = 'Medium';
-    // mediumPriority.innerText = 'Medium';
-    // const highPriority = document.createElement('option');
-    // highPriority.value = 'High';
-    // highPriority.innerText = 'High';
-    // const critPriority = document.createElement('option');
-    // critPriority.value = 'Critical';
-    // critPriority.innerText = 'Critical';
-
-    // dropdownPriority.appendChild(lowPriority)
-    // dropdownPriority.appendChild(mediumPriority)
-    // dropdownPriority.appendChild(highPriority)
-    // dropdownPriority.appendChild(critPriority)
-    
     const submitBtn = document.createElement('button');
     submitBtn.type = 'submit';
     submitBtn.id = 'item-modal-submit-btn'
@@ -752,6 +709,7 @@ function createCalendarModal() {
     calendar.type = 'date';
     calendar.id = 'modal-calendar';
     calendar.placeholder = 'Due date';
+    calendar.addEventListener('click', () => {closeModal(modal)})
 
     const todayBtn = document.createElement('button');
     todayBtn.textContent = 'Today'
@@ -761,6 +719,7 @@ function createCalendarModal() {
     todayBtn.addEventListener('click', () => {
         todayBtn.classList.toggle('active');
         calendar.value = format(new Date(), 'yyyy' + '-' + 'MM' + '-' + 'dd');
+        closeModal(modal)
     })
 
     const tomorrowBtn = document.createElement('button');
@@ -771,6 +730,7 @@ function createCalendarModal() {
     tomorrowBtn.addEventListener('click', () => {
         tomorrowBtn.classList.toggle('active');
         calendar.value = format((add(new Date(), {days: 1})), 'yyyy' + '-' + 'MM' + '-' + 'dd');
+        closeModal(modal)
 
     })
 
@@ -781,7 +741,10 @@ function createCalendarModal() {
     nextWeekBtn.value = 'next-week';
     nextWeekBtn.addEventListener('click', () => {
         nextWeekBtn.classList.toggle('active');
-        calendar.value = format((add(new Date(), {weeks: 1})), 'yyyy' + '-' + 'MM' + '-' + 'dd');    })
+        calendar.value = format((add(new Date(), {weeks: 1})), 'yyyy' + '-' + 'MM' + '-' + 'dd');    
+        closeModal(modal);
+        console.log('hi');
+    })
 
     btnContainer.appendChild(todayBtn);
     btnContainer.appendChild(tomorrowBtn);
@@ -813,6 +776,7 @@ function createPriorityModal() {
     lowBtn.id = 'priority-modal-low-btn';
     lowBtn.addEventListener('click', () => {
         priorityInput.value = 'Low';
+        closeModal(modal);
     })
     
     const mediumBtn = document.createElement('button');
@@ -823,6 +787,8 @@ function createPriorityModal() {
     mediumBtn.id = 'priority-modal-medium-btn';
     mediumBtn.addEventListener('click', () => {
         priorityInput.value = 'Medium';
+        closeModal(modal);
+
     })
     
     const highBtn = document.createElement('button');
@@ -833,6 +799,8 @@ function createPriorityModal() {
     highBtn.id = 'priority-modal-high-btn';
     highBtn.addEventListener('click', () => {
         priorityInput.value = 'High';
+        closeModal(modal);
+
     })
     
     const criticalBtn = document.createElement('button');
@@ -843,6 +811,7 @@ function createPriorityModal() {
     criticalBtn.id = 'priority-modal-critical-btn';
     criticalBtn.addEventListener('click', () => {
         priorityInput.value = 'Critical';
+        closeModal(modal);
     })
 
     form.appendChild(priorityInput);
@@ -860,12 +829,9 @@ function createPriorityModal() {
 
 // process item form 2
 
-function closeAllModals() {
-    const addItemModal = document.getElementById('add-item-modal');
-    const addProjectModal = document.getElementById('add-project-modal');
-    addItemModal.classList.remove('modal-active');
-    addProjectModal.classList.remove('modal-active')
-
+function closeModal(modal) {
+    modal.classList.remove(`${modal.id}-active`);
+    modal.style.display = 'none';
 }
 
 function resetForms() {
@@ -1194,7 +1160,7 @@ function createMain() {
     const main = document.createElement('main');
     main.classList.add('main');
     main.id = 'main';
-    main.addEventListener('click', closeAllModals);
+    // main.addEventListener('click', closeAllModals);
 
     return main;
 }
