@@ -104,8 +104,22 @@ html, body {
     width: fit-content;
 }
 
-.sidebar-projects-dropdown-option-active {
+.sidebar-projects-dropdown-option-active,
+.sidebar-projects-dropdown-option-active + p {
     font-weight: 800;
+}
+
+.sidebar-option {
+    display: flex;
+    align-items: center;
+}
+
+.project-items-number {
+    margin-left: 3px;
+    font-size: 0.9rem;
+    /* font-family:Arial, Helvetica, sans-serif; */
+    color:rgb(44, 44, 44);
+    /* height: 1% */
 }
 
 
@@ -371,6 +385,18 @@ input {
     color: rgb(73, 73, 73);
     box-shadow: none;
     transition-duration: 0.2s;
+    animation-name: appear;
+    animation-duration: 0.2s;
+}
+
+@keyframes appear {
+    0% { opacity: 0% }
+    100% { opacity: 100% }
+}
+
+@keyframes complete-appear {
+    0% { opacity: 0% }
+    100% { opacity: 15% }
 }
 
 /* .item-card:after {
@@ -421,9 +447,6 @@ input {
     color: rgb(151, 151, 151);
 }
 
-.item-card-complete {
-    opacity: 15%;
-}
 
 .item-card-complete .item-complete-btn {
     background-color: lightgreen;
@@ -452,6 +475,8 @@ input {
 .item-card-complete {
     opacity: 15%;
     text-decoration: line-through;
+    animation-name: complete-appear;
+    animation-duration: 0.2s;
 }
 
 .item-card-flag {

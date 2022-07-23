@@ -3,28 +3,22 @@ import calendarIcon from "../icons/calendar.jpg";
 import priorityIcon from "../icons/exclamation.png"
 
 // TODO
-// Undo completed tasks (Complete button currently just copies itself)
-// Preference to send completed tasks to beginning or end or list
 // Form validation
 // View all tasks (sort by urgency) (no project)
 // drag n drop
-// buttons dont work on completed projects
 // close all modals when one is clicked to open
-// Footer can have switches (mode, sorting, etc)
 // Close buttons on project modal
 // Add 'number of days until due'
 // Organize all tasks by date, include project in this case
-// Remove task button does not work on completed tasks
 // Add task button not currently working on addproject button
-// Edit task
-// double-click project name to rename
+// Double click task to edit all fields - could createAddItemModal be factored
+//       to do createAddItemModal('itemID') rather than auto appending to main,
+//       or write another function entirely - addModalTo('itemID')?
 // New project modal - maybe just in the header
 // Seems like it may be worthwhile to track when it's in task mode
 // Item modals + project modal all need fine tuning - close options, appearing in the right places, etc.
 // When a task is completed in All tasks view, it should not render the project
-// Be able to click out of rename title form to submit it
 // Absolute positioning isn't working with px values as it depends on monitor
-// Number of todos in sidebar (Birdbot v.20 (28))
 
 // IDEAS
 // Home (Tasks due today, stats snapshot, projects summary) / This Week / Projects / Stats
@@ -35,8 +29,13 @@ import priorityIcon from "../icons/exclamation.png"
 // Be able to pin an item
 // Collapible todo categories
 // Stats sidebar
-// Sorting
+// Sorting (on proj cards and ALl Tasks));
 // If another card is needed at some point, could be square sides
+// Preference to send completed tasks to beginning or end or list
+// Footer can have switches (mode, sorting, etc)
+// Remove task button
+
+
 
 
 import {isAfter, format, getDay, parseISO, add} from 'date-fns';
@@ -322,16 +321,35 @@ function completeProject(projectToComplete) {
 
 function completeItem(itemToComplete) {
     const project = getProject(itemToComplete.project);
-    const indexOfItem = project.items.findIndex((item) => item.title === itemToComplete.title);
-    const firstIndex = findFirstCompletedItem(project);
-    itemToComplete.isComplete = true;
-    itemToComplete.completedDate = new Date();
-    console.log(itemToComplete);
-  
-    project.items.push(project.items.splice(indexOfItem,1)[0])
-      
+    // undo complete
+    if(itemToComplete.isComplete){
+        const firstIndex = findFirstCompletedItem(project);
+        itemToComplete.isComplete = false;
+        removeItem(itemToComplete);
+        if(itemToComplete.priority === 'Critical'){
+            project.items.unshift(itemToComplete);
+        } else {
+        project.items.splice(firstIndex, 0, itemToComplete);
+        }
+
+    } else {
+        const indexOfItem = project.items.findIndex((item) => item.title === itemToComplete.title);
+        itemToComplete.isComplete = true;
+        itemToComplete.completedDate = new Date();
+        console.log(itemToComplete);
+    
+        project.items.push(project.items.splice(indexOfItem,1)[0])
+    }
     updatePage();
 }
+
+// function undoComplete(completedItem){
+//     const project = getProject(completedItem);
+//     const firstIndex = findFirstCompletedItem(project);
+//     completedItem.isComplete = false;
+//     removeItem(completedItem);
+//     project.items.splice(firstIndex, 1, completedItem);
+// }
 
 function findFirstCompletedItem(project) {
     const firstCompleted = project.items.find((item) => item.isComplete);
@@ -436,10 +454,6 @@ function loadDemo() {
                                 'Housework'));
 
     const proj2 = createProject('Birdbot v2.0');
-    proj2.addToItems(createItem('Determine maximum number of API calls per day', 
-                                format((add(new Date(), {weeks: 1})), "eee, " + "MMMM " + "dd"),
-                                'High',
-                                'Birdbot v2.0'));
 
         
     proj2.items.unshift(createItem('Start learning React', 
@@ -1029,12 +1043,12 @@ function createSidebar() {
 }
 
 function makeProjectBold(){
+    // Currently broken
     const projects = document.getElementsByClassName('sidebar-projects-dropdown-option');
     for(let i = 0; i < projects.length; i++){
         projects[i].classList.remove('sidebar-projects-dropdown-option-active');
         console.log(projects[i]);
-        if(projects[i].innerHTML == _lastOpenedProject){
-            console.log('Last open');
+        if(projects[i].textContent == _lastOpenedProject){
             projects[i].classList.add('sidebar-projects-dropdown-option-active')
         }
     }
@@ -1070,16 +1084,22 @@ function createSidebarMenus() {
    
     for(let project of _projects){
         const projOption = document.createElement('li');
-        projOption.classList.add('sidebar-projects-dropdown-option');
-        projOption.id = project.title;
-        projOption.textContent = project.title;
-        projOption.addEventListener('click', (e) => {
-            // projOption.classList.toggle('sidebar-projects-dropdown-option-active');
+        projOption.classList.add('sidebar-option');
+        const projectTitle = document.createElement('p');
+        const numberOfItems = document.createElement('p');
+        numberOfItems.classList.add('project-items-number');
+        numberOfItems.innerText = `(${project.items.length})`;
+        projectTitle.classList.add('sidebar-projects-dropdown-option');
+        projectTitle.id = project.title;
+        projectTitle.textContent = project.title;
+        projectTitle.addEventListener('click', (e) => {
+            // project.classList.toggle('sidebar-projects-dropdown-option-active');
             renderProject(project);
             makeProjectBold();
             // Add class that makes option bold when selected
         })
-
+        projOption.appendChild(projectTitle);
+        projOption.appendChild(numberOfItems);
         projectMenu.appendChild(projOption);
     }
     menuContainer.appendChild(projectMenu);
