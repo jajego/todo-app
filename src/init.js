@@ -53,10 +53,11 @@ class Item {
 }
 
 class Project {
-    constructor(title) {
+    constructor(title, color) {
         this.title = title;
         this.items = [];
         this.isComplete = false;
+        this.color = color;
     }
 
     addToItems(item) {
@@ -64,12 +65,14 @@ class Project {
     }
 
     removeItem(item) {
-        this.items.filter((listItem) => listItem.title !== item.title)
+        this.items = this.items.filter((listItem) => listItem.title !== item.title)
     }
 
     getItem(item) {
         return this.items.find((listItem) => listItem.title === item.title)
     }
+
+
 
     rename(newTitle){
         return this.title = newTitle;
@@ -186,8 +189,8 @@ function createItemCardFlag(item) {
 
 }
 
-function createProject(title) {
-    let project = new Project(title);
+function createProject(title, color) {
+    let project = new Project(title, color);
     
     return project;
 }
@@ -297,7 +300,14 @@ function createProjectCard(project) {
 
 
     for(let item of project.items){
-        itemCardContainer.appendChild(createItemCard(item));
+        const itemCard = createItemCard(item);
+        itemCard.addEventListener('mouseover', () => {
+            itemCard.style.boxShadow = `-4px 4px ${project.color}`;
+        })
+        itemCard.addEventListener('mouseleave', () => {
+            itemCard.style.boxShadow = 'none'
+        } )
+        itemCardContainer.appendChild(itemCard);
     }
    
     projectCard.appendChild(itemCardContainer);
@@ -321,10 +331,14 @@ function completeProject(projectToComplete) {
 
 function completeItem(itemToComplete) {
     const project = getProject(itemToComplete.project);
+    console.log('-----------')
+    console.log(project)
     // undo complete
     if(itemToComplete.isComplete){
         const firstIndex = findFirstCompletedItem(project);
         itemToComplete.isComplete = false;
+        itemToComplete.completedDate = '';
+        // project.removeItem(itemToComplete);
         removeItem(itemToComplete);
         if(itemToComplete.priority === 'Critical'){
             project.items.unshift(itemToComplete);
@@ -343,14 +357,6 @@ function completeItem(itemToComplete) {
     updatePage();
 }
 
-// function undoComplete(completedItem){
-//     const project = getProject(completedItem);
-//     const firstIndex = findFirstCompletedItem(project);
-//     completedItem.isComplete = false;
-//     removeItem(completedItem);
-//     project.items.splice(firstIndex, 1, completedItem);
-// }
-
 function findFirstCompletedItem(project) {
     const firstCompleted = project.items.find((item) => item.isComplete);
     console.log('Found first completed: ' + firstCompleted);
@@ -364,8 +370,6 @@ function findFirstCompletedItem(project) {
 
 function createAppNav() {
     const addItemModal = document.getElementById('add-item-modal');
-    const addProjectModal = document.getElementById('add-project-modal');
-
     const projectCardNav = document.createElement('nav');
 
     const addProjectBtn = document.createElement('button');
@@ -374,25 +378,18 @@ function createAppNav() {
     addProjectBtn.classList.add('add-project-btn');
     addProjectBtn.innerHTML = 'New project';
     addProjectBtn.addEventListener('click', () => {
+        const addProjectModal = document.getElementById('add-project-modal');
         addProjectModal.classList.toggle('modal-active');
-        if(addProjectModal.style.display === 'block') {
+        if(addProjectModal.style.display === 'flex') {
             addProjectModal.style.display = 'none';
         } else {
-            addProjectModal.style.display = 'block';
+            addProjectModal.style.display = 'flex';
         }
     })
 
-    addItemBtn.classList.add('add-item-btn');
-    addItemBtn.innerHTML = 'Add task';
-    addItemBtn.addEventListener('click', () => {
-        addItemModal.classList.toggle('modal-active');
-        if(addItemModal.style.display === 'block') {
-            addItemModal.style.display = 'none';
-        } else {
-            addItemModal.style.display = 'block';
-        }
-    })
-
+    const left = document.createElement('div');
+    left.id = 'header-left';
+    left.classList.add('header-section')
     const right = document.createElement('div');
     right.id = 'header-right';
     right.classList.add('header-section');
@@ -410,14 +407,12 @@ function createAppNav() {
         localStorage.clear();
         console.log('localStorage cleared')
     })
-    
-    projectCardNav.appendChild(addProjectBtn);
-    // projectCardNav.appendChild(addItemBtn);
-    // projectCardNav.appendChild(editProjectTitleBtn);
+    left.appendChild(addProjectBtn);
+    left.appendChild(createAddProjectModal())
+    projectCardNav.appendChild(left);
     right.appendChild(loadDemoBtn);
     right.appendChild(clearLocalStorageBtn);
     projectCardNav.appendChild(right);
-   
 
     return projectCardNav;
 }
@@ -425,7 +420,7 @@ function createAppNav() {
 
 
 function loadDemo() {
-    const proj1 = createProject('Housework');
+    const proj1 = createProject('Housework', 'blue');
     proj1.addToItems(createItem('Check in with contractors about renovations', 
                                 format((add(new Date(), {weeks: 1})), "eee, " + "MMMM " + "dd"),
                                 'Medium',
@@ -453,7 +448,7 @@ function loadDemo() {
                                 'Critical',
                                 'Housework'));
 
-    const proj2 = createProject('Birdbot v2.0');
+    const proj2 = createProject('Birdbot v2.0', 'rgb(51,102,36)');
 
         
     proj2.items.unshift(createItem('Start learning React', 
@@ -589,13 +584,25 @@ function createAddProjectModal() {
     projectTitleInput.id = 'project-title-input';
     projectTitleInput.name = 'new-project-title';
 
+    const projectColorLabel = document.createElement('label');
+    projectColorLabel.id = 'new-project-color'
+    projectColorLabel.innerText = 'Color: '
+
+    const projectColorInput = document.createElement('input');
+    projectColorInput.type = 'color';
+    projectColorInput.id = 'project-color-input';
+    projectColorInput.name = 'new-project-color';
+
     const submitBtn = document.createElement('button');
     submitBtn.type = 'submit';
     submitBtn.innerText = 'Submit';
 
     addProjectForm.appendChild(projectTitleLabel)
     addProjectForm.appendChild(projectTitleInput)
+    addProjectForm.appendChild(projectColorLabel);
+    addProjectForm.appendChild(projectColorInput);
     addProjectForm.appendChild(submitBtn);
+
     addProjectForm.onsubmit = addProject;
 
     addProjectModal.appendChild(addProjectForm);
@@ -871,7 +878,8 @@ function resetForms() {
 
 function processProjectFormData() {
     const title = document.getElementById('project-title-input').value;
-    return createProject(title)
+    const color = document.getElementById('project-color-input').value;
+    return createProject(title, color)
 }
 
 function processItemFormData() {
@@ -900,6 +908,8 @@ function addProject(e) {
     console.log('Adding project')
     e.preventDefault();
     const newProject = processProjectFormData();
+    newProject.color = document.getElementById('project-color-input').value;
+    console.log(newProject.color);
     console.log('Successfully processed project form data')
     _projects.push(newProject);
     _lastOpenedProject = newProject.title;
@@ -953,6 +963,10 @@ function removeItem(itemToRemove) {
 
 function getProject(title) {
     return _projects.find((project) => project.title === title);
+}
+
+function getNumberOfCompletedItems(project){
+    return project.items.filter((item) => item.isComplete).length;
 }
 
 function sortProjects() {
@@ -1083,23 +1097,35 @@ function createSidebarMenus() {
     projectMenu.id = 'sidebar-projects-dropdown';
    
     for(let project of _projects){
+        const optionLeft = document.createElement('div');
+        optionLeft.classList.add('sidebar-option-left');
+        const optionRight = document.createElement('div');
+        optionRight.classList.add('sidebar-option-right');
+        
+        const colorMarker = document.createElement('div');
+        colorMarker.style.backgroundColor = project.color;
+        colorMarker.classList.add('project-color-marker');
         const projOption = document.createElement('li');
         projOption.classList.add('sidebar-option');
         const projectTitle = document.createElement('p');
         const numberOfItems = document.createElement('p');
+        const numberOfCompleteItems = getNumberOfCompletedItems(project);
         numberOfItems.classList.add('project-items-number');
-        numberOfItems.innerText = `(${project.items.length})`;
+        numberOfItems.innerText = `(${project.items.length - numberOfCompleteItems})`;
         projectTitle.classList.add('sidebar-projects-dropdown-option');
         projectTitle.id = project.title;
         projectTitle.textContent = project.title;
-        projectTitle.addEventListener('click', (e) => {
+        projOption.addEventListener('click', (e) => {
             // project.classList.toggle('sidebar-projects-dropdown-option-active');
             renderProject(project);
             makeProjectBold();
             // Add class that makes option bold when selected
         })
-        projOption.appendChild(projectTitle);
-        projOption.appendChild(numberOfItems);
+        optionLeft.appendChild(colorMarker);
+        optionRight.appendChild(projectTitle);
+        optionRight.appendChild(numberOfItems);
+        projOption.appendChild(optionLeft);
+        projOption.appendChild(optionRight);
         projectMenu.appendChild(projOption);
     }
     menuContainer.appendChild(projectMenu);
@@ -1159,6 +1185,7 @@ function createHeader() {
     const header = document.createElement('header');
     header.classList.add('header');
     header.id = 'header';
+    header.appendChild(createAppNav());
 
     return header;
 }
@@ -1183,8 +1210,7 @@ function createFooter() {
 function initTodoApp() {
 
     const header = document.body.appendChild(createHeader());
-    document.body.appendChild(createAddProjectModal());
-    header.appendChild(createAppNav());
+    // header.appendChild(createAppNav());
 
     const content = document.body.appendChild(createAppContainer());
     content.appendChild(createSidebar());
@@ -1213,8 +1239,6 @@ const updateSidebarMenu = () => {
 function setWidthFromChars(input){
     return input.style.width = (input.value.length-0.5) + 'ch';
 }
-
-
 
 const updatePage = () => {
     saveLocal();

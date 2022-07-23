@@ -8,6 +8,47 @@ html, body {
     height: 100%;
 }
 
+#header {
+    padding: 10px;
+    height: 50px;
+    background-color: rgb(28, 41, 58);
+    display: flex;
+    align-items: center;   
+}
+
+#header-left,
+#header-right {
+    display: flex;
+    width: 50%;
+}
+
+#header-left {
+    justify-content: flex-start;
+}
+
+#new-project-title,
+#new-project-color {
+    color: antiquewhite;
+    margin-right: 3px;
+}
+
+
+
+#header-right {
+    justify-content: flex-end;
+}
+
+nav {
+    display: flex;
+    width: 100%;
+    justify-content: space-between;
+}
+
+#header button {
+    margin: 8px;
+}
+
+
 
 #add-item-modal, 
 #add-project-modal {
@@ -15,6 +56,29 @@ html, body {
     margin-left: 11px;
 
 }
+
+#add-project-form {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+#project-color-input {
+    width: 30px;
+    height: 30px;
+    /* border-radius: 2px; */
+}
+
+#main {
+    display: flex;
+    flex-direction: column;
+    flex-wrap: wrap;
+    height: 100%;
+    background-color: inherit;
+/* background-image: url("data:image/svg+xml,%3Csvg width='70' height='70' viewBox='0 0 70 70' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23323232' fill-opacity='0.4' fill-rule='evenodd'%3E%3Cpath d='M0 0h35v35H0V0zm5 5h25v25H5V5zm5 5h15v15H10V10zm5 5h5v5h-5v-5zM40 5h25v25H40V5zm5 5h15v15H45V10zm5 5h5v5h-5v-5zM70 35H35v35h35V35zm-5 5H40v25h25V40zm-5 5H45v15h15V45zm-5 5h-5v5h5v-5zM30 40H5v25h25V40zm-5 5H10v15h15V45zm-5 5h-5v5h5v-5z'/%3E%3C/g%3E%3C/svg%3E");    width: 20000px; */
+}
+
+
 
 
 
@@ -74,8 +138,6 @@ html, body {
 
 }
 
-.sidebar-menu-active 
-
 .sidebar-menu-active, .collapsible:hover {
     background-color: #ccc;
 }
@@ -89,7 +151,6 @@ html, body {
     flex-direction: column;
     /* justify-content:center; */
     align-items: flex-end;
-    padding: 10px;
     list-style-type: none;
 }
 
@@ -111,14 +172,49 @@ html, body {
 
 .sidebar-option {
     display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: pointer;
+    width: 100%;
+    padding: 5px;
+    /* border-bottom: 1px solid rgb(177, 177, 177); */
+}
+
+.sidebar-option:not(:last-child){
+    border-bottom: 1px solid rgb(224, 224, 224);
+}
+
+.sidebar-option-left,
+.sidebar-option-right {
+    display: flex;
     align-items: center;
 }
 
-.project-items-number {
+.sidebar-option-right {
+    width: 90%;
+    justify-content: flex-end;
+}
+
+.sidebar-option-left {
+    width: 10%;
+    margin-left: 10px;
+}
+
+
+.project-color-marker {
+    border: 2px solid black;
+    width: 10px;
+    height: 10px;
+    border-radius: 100%;
     margin-left: 3px;
+}
+
+.project-items-number {
     font-size: 0.9rem;
     /* font-family:Arial, Helvetica, sans-serif; */
     color:rgb(44, 44, 44);
+    padding: 3px;
+    border-radius: 100%;
     /* height: 1% */
 }
 
@@ -211,6 +307,8 @@ input {
     margin-left: 11px;
     width: 100%;
     /* width: 100%; */
+    /* animation-name: appear;
+    animation-duration: 0.2s; */
 }
 
 .project-card-complete {
@@ -376,17 +474,16 @@ input {
     padding: 15px;
     width: fit-content;
     /* padding-left: 0; */
-    border: 2px solid rgb(35, 40, 43);
+    border: 1px solid rgb(35, 40, 43);
     border-radius: 15px;
     /* border-top-right-radius: 15px;
     border-bottom-right-radius: 15px; */
     /* box-shadow: -4px 4px rgb(238, 78, 78); */
     /* transition: .1s; */
     color: rgb(73, 73, 73);
-    box-shadow: none;
+    /* box-shadow: none; */
     transition-duration: 0.2s;
-    animation-name: appear;
-    animation-duration: 0.2s;
+   
 }
 
 @keyframes appear {
@@ -406,10 +503,9 @@ input {
     border: 2px solid black;
 } */
 
-.item-card:hover {
+/* .item-card:hover {
     box-shadow: -4px 4px rgb(238, 78, 78);
-    /* animation-timing-function: ease; */
-}
+} */
 
 .item-card-top {
     display: flex;
@@ -475,8 +571,8 @@ input {
 .item-card-complete {
     opacity: 15%;
     text-decoration: line-through;
-    animation-name: complete-appear;
-    animation-duration: 0.2s;
+    /* animation-name: complete-appear;
+    animation-duration: 0.2s; */
 }
 
 .item-card-flag {
@@ -512,32 +608,7 @@ input {
 }
 
 
-#header {
-    padding: 10px;
-    height: 50px;
-    background-color: rgb(28, 41, 58);
-    display: flex;
-    align-items: center;   
-}
 
-nav {
-    display: flex;
-    width: 100%;
-    justify-content: space-between;
-}
-
-#header button {
-    margin: 8px;
-}
-
-#main {
-    display: flex;
-    flex-direction: column;
-    flex-wrap: wrap;
-    height: 100%;
-    background-color: inherit;
-/* background-image: url("data:image/svg+xml,%3Csvg width='70' height='70' viewBox='0 0 70 70' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23323232' fill-opacity='0.4' fill-rule='evenodd'%3E%3Cpath d='M0 0h35v35H0V0zm5 5h25v25H5V5zm5 5h15v15H10V10zm5 5h5v5h-5v-5zM40 5h25v25H40V5zm5 5h15v15H45V10zm5 5h5v5h-5v-5zM70 35H35v35h35V35zm-5 5H40v25h25V40zm-5 5H45v15h15V45zm-5 5h-5v5h5v-5zM30 40H5v25h25V40zm-5 5H10v15h15V45zm-5 5h-5v5h5v-5z'/%3E%3C/g%3E%3C/svg%3E");    width: 20000px; */
-}
 
 .projects-placeholder {
     margin: auto;
