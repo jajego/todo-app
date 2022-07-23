@@ -167,7 +167,7 @@ nav {
 
 .sidebar-projects-dropdown-option-active,
 .sidebar-projects-dropdown-option-active + p {
-    font-weight: 800;
+    font-weight: 700;
 }
 
 .sidebar-option {
@@ -201,13 +201,14 @@ nav {
 }
 
 
-.project-color-marker {
+/* .project-color-marker {
     border: 2px solid black;
     width: 10px;
     height: 10px;
     border-radius: 100%;
     margin-left: 3px;
-}
+    opacity: 20%;
+} */
 
 .project-items-number {
     font-size: 0.9rem;
@@ -474,7 +475,7 @@ input {
     padding: 15px;
     width: fit-content;
     /* padding-left: 0; */
-    border: 1px solid rgb(35, 40, 43);
+    border: 2px solid rgb(35, 40, 43);
     border-radius: 15px;
     /* border-top-right-radius: 15px;
     border-bottom-right-radius: 15px; */
