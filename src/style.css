@@ -93,9 +93,7 @@ html, body {
     list-style-type: none;
 }
 
-#sidebar-tasks-dropdown {
-    display: none;
-}
+
 
 .sidebar-projects-dropdown-option,
 .sidebar-tasks-dropdown-option {
@@ -366,6 +364,8 @@ input {
     /* padding-left: 0; */
     border: 2px solid rgb(35, 40, 43);
     border-radius: 15px;
+    /* border-top-right-radius: 15px;
+    border-bottom-right-radius: 15px; */
     /* box-shadow: -4px 4px rgb(238, 78, 78); */
     /* transition: .1s; */
     color: rgb(73, 73, 73);

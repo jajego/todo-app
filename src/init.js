@@ -24,8 +24,10 @@ import priorityIcon from "../icons/exclamation.png"
 // When a task is completed in All tasks view, it should not render the project
 // Be able to click out of rename title form to submit it
 // Absolute positioning isn't working with px values as it depends on monitor
+// Number of todos in sidebar (Birdbot v.20 (28))
 
 // IDEAS
+// Home (Tasks due today, stats snapshot, projects summary) / This Week / Projects / Stats
 // Arrows pointing to certain tasks from the right - Alert! This task is due in 2 days! etc
 // Be able to tag projects by color
 // Communicate priority by border around OR just color the circle differently
@@ -34,6 +36,7 @@ import priorityIcon from "../icons/exclamation.png"
 // Collapible todo categories
 // Stats sidebar
 // Sorting
+// If another card is needed at some point, could be square sides
 
 
 import {isAfter, format, getDay, parseISO, add} from 'date-fns';
@@ -76,7 +79,7 @@ class Project {
 
 let _projects = [];
 let _lastOpenedProject;
-// _currView will either be 'Project' or 'Tasks'
+// _currView will either be 'Project' or 'Tasks' or 'Stats' or 'Home'
 let _currView = 'project';
 
 function createItem(title, dueDate, priority, project) {
@@ -1090,10 +1093,10 @@ function createSidebarMenus() {
         e.target.classList.toggle('sidebar-menu-active');
         console.log(e.target);
         const tasks = e.target.nextElementSibling;
-        if(tasks.style.display === 'flex') {
-            tasks.style.display = 'none';
-        } else {
+        if(tasks.style.display === 'none') {
             tasks.style.display = 'flex';
+        } else {
+            tasks.style.display = 'none';
         }
     })
 
