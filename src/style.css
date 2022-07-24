@@ -10,7 +10,7 @@ html, body {
 
 #header {
     padding: 10px;
-    height: 50px;
+    height: 30px;
     background-color: rgb(28, 41, 58);
     display: flex;
     align-items: center;   
@@ -201,14 +201,12 @@ nav {
 }
 
 
-/* .project-color-marker {
-    border: 2px solid black;
-    width: 10px;
-    height: 10px;
-    border-radius: 100%;
+.project-color-marker {
+    width: 8px;
+    height: 8px;
+    /* border-radius: 100%; */
     margin-left: 3px;
-    opacity: 20%;
-} */
+}
 
 .project-items-number {
     font-size: 0.9rem;
@@ -593,19 +591,16 @@ input {
     animation-duration: 0.2s; */
 }
 
-.due-flag-container {
-    width: 100%;
-    display: flex;
-}
+
 
 .item-card-flag,
-.due-flag {
+.due-flag-container {
     background-color: rgb(255, 245, 234);
     display: flex;
-    font-size: 0.8rem;
+    align-items: center;
+    font-size: 0.7rem;
     width: fit-content;
     padding: 5px;
-    justify-self: right;
     border-radius: 5px;
     cursor: pointer;
     border: 1px solid #eee;
@@ -622,7 +617,8 @@ input {
 }
 
 .item-card-flag-icon {
-    margin-right: 2px;
+    margin-right: 5px;
+    font-size: 0.6rem;
 }
 
 #all-items-container {
