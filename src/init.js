@@ -19,6 +19,8 @@ import priorityIcon from "../icons/exclamation.png"
 // Item modals + project modal all need fine tuning - close options, appearing in the right places, etc.
 // When a task is completed in All tasks view, it should not render the project
 // Absolute positioning isn't working with px values as it depends on monitor
+// Make dueDate an actual date, and only format it when it's used
+// createProjectFlag function instead of being a whole other card function
 
 // IDEAS
 // Home (Tasks due today, stats snapshot, projects summary) / This Week / Projects / Stats
@@ -191,12 +193,16 @@ function createItemCardFlag(item) {
 }
 
 function createDateFlag(item) {
+    const dueDate = item.dueDate;
     const flagContainer = document.createElement('div');
     flagContainer.classList.add('due-flag-container');
     const flag = document.createElement('div');
-    const dueDate = item.dueDate;
+    const flagIcon = document.createElement('div')
+    flagIcon.textContent = `⏲️ `;
+    flagIcon.classList.add('item-card-flag-icon');
+    flag.textContent = dueDate;
     flag.classList.add('due-flag');
-    flag.textContent = `⏰ ${dueDate}`
+    flagContainer.appendChild(flagIcon);
     flagContainer.appendChild(flag);
     return flagContainer;
 }

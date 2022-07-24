@@ -490,7 +490,7 @@ input {
     padding: 15px;
     width: fit-content;
     /* padding-left: 0; */
-    border: 2px solid rgb(35, 40, 43);
+    border: 1px solid rgb(35, 40, 43);
     border-radius: 15px;
     /* border-top-right-radius: 15px;
     border-bottom-right-radius: 15px; */
