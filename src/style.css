@@ -10,7 +10,7 @@ html, body {
 
 #header {
     padding: 10px;
-    height: 30px;
+    height: 35px;
     background-color: rgb(28, 41, 58);
     display: flex;
     align-items: center;   
@@ -129,7 +129,7 @@ nav {
 }
 
 .collapsible {
-    background-color: rgb(235, 235, 235);
+    background-color: rgb(225, 236, 172);
     cursor: pointer;
     padding: 8px;
     color:rgb(0, 0, 0);
@@ -204,7 +204,7 @@ nav {
 .project-color-marker {
     width: 8px;
     height: 8px;
-    /* border-radius: 100%; */
+    border-radius: 100%;
     margin-left: 3px;
 }
 
@@ -488,6 +488,7 @@ input {
     margin-right: 45px;
     margin-bottom: 15px;
     padding: 15px;
+    min-width: 300px;
     width: fit-content;
     /* padding-left: 0; */
     border: 1px solid rgb(35, 40, 43);
@@ -591,29 +592,31 @@ input {
     animation-duration: 0.2s; */
 }
 
-
-
-.item-card-flag,
-.due-flag-container {
-    background-color: rgb(255, 245, 234);
+.item-card-flag-container {
     display: flex;
-    align-items: center;
-    font-size: 0.7rem;
-    width: fit-content;
-    padding: 5px;
-    border-radius: 5px;
-    cursor: pointer;
-    border: 1px solid #eee;
-    transition-duration: .1s;
-    margin-top: 10px;
+    gap: 10px;
 }
 
 
 
-.item-card-flag:hover,
-.due-flag:hover {
-    background-color: rgb(240, 231, 221);
+.project-flag-container,
+.due-flag-container {
+    background-color: rgb(255, 255, 255);
+    display: flex;
+    align-items: center;
+    font-size: 0.7rem;
+    font-weight: 400;
+    width: fit-content;
+    padding: 5px;
+    border-radius: 5px;
+    cursor: pointer;
+    border: 2px solid #eee;
+    transition-duration: .1s;
+    margin-top: 10px;
+}
 
+.project-flag-container:hover {
+    background-color: goldenrod;
 }
 
 .item-card-flag-icon {
@@ -710,7 +713,7 @@ button {
     width: 15px;
     height: 15px;
     margin-top: 2px;
-    background-color: white;
+    background-color: rgb(255, 255, 255);
     border-radius: 25%;
     cursor: pointer;
     border: 3px solid rgb(144, 238, 199);

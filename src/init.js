@@ -10,12 +10,9 @@ import priorityIcon from "../icons/exclamation.png"
 // Close buttons on project modal
 // Add 'number of days until due'
 // Organize all tasks by date, include project in this case
-// Add task button not currently working on addproject button
 // Double click task to edit all fields - could createAddItemModal be factored
 //       to do createAddItemModal('itemID') rather than auto appending to main,
 //       or write another function entirely - addModalTo('itemID')?
-// New project modal - maybe just in the header
-// Seems like it may be worthwhile to track when it's in task mode
 // Item modals + project modal all need fine tuning - close options, appearing in the right places, etc.
 // When a task is completed in All tasks view, it should not render the project
 // Absolute positioning isn't working with px values as it depends on monitor
@@ -95,6 +92,7 @@ function createItemCard(item) {
     const itemContentContainer = document.createElement('div');
     const left                 = document.createElement('div');
     const right                = document.createElement('div');
+    const flagContainer        = document.createElement('div');
     const itemCompleteBtn      = document.createElement('div');
     const itemTitle            = document.createElement('h4');
     const itemDueDate          = document.createElement('p')
@@ -112,6 +110,7 @@ function createItemCard(item) {
     itemDueDate.classList.add('item-due-date');
     itemPriority.classList.add('item-priority');
     right.classList.add('item-card-right')
+    flagContainer.classList.add('item-card-flag-container')
     itemCompleteBtn.classList.add('item-card-btn');
     itemCompleteBtn.classList.add('item-complete-btn');
     removeItemBtn.classList.add('item-remove-btn');
@@ -164,32 +163,31 @@ function createItemCard(item) {
     
     if(item.dueDate !== ''){
         // itemDueDate.textContent = `Due: ${item.dueDate}`;
-        itemCard.appendChild(createDateFlag(item));
+        flagContainer.appendChild(createDateFlag(item));
     }
+    if(_currView === 'Task'){
+        flagContainer.appendChild(createProjectFlag(item));
+    }
+    itemCard.appendChild(flagContainer);
     return itemCard;
 }
 
-function createItemCardFlag(item) {
-    const itemCard = createItemCard(item);
-    const bottom = document.createElement('div');
-    bottom.classList.add('item-card-bottom');
+function createProjectFlag(item) {
+    const flagContainer = document.createElement('div');
+    flagContainer.classList.add('project-flag-container');
     const flag = document.createElement('div');
-    flag.classList.add('item-card-flag');
-    const flagIcon = document.createElement('div')
+    flag.classList.add('project-flag');
+    flag.textContent = item.project;
+    const flagIcon = document.createElement('div');
     flagIcon.textContent = `🏷️`;
     flagIcon.classList.add('item-card-flag-icon');
-    const project = document.createElement('p');
-    project.textContent = item.project;
-    project.classList.add('item-card-flag-project')
-
-    flag.addEventListener('click', () => {
+    flagContainer.appendChild(flagIcon);
+    flagContainer.appendChild(flag);
+    flagContainer.addEventListener('click', () => {
         renderProject(getProject(item.project));
     })
-    bottom.appendChild(flag);
-    itemCard.appendChild(bottom);
-    flag.appendChild(flagIcon);
-    flag.appendChild(project);
-    return itemCard;
+
+    return flagContainer;
 }
 
 function createDateFlag(item) {
@@ -994,6 +992,7 @@ function renderProjectCards() {
 
 function renderProject(project) {
     resetPage();
+    _currView = 'Project';
     // if(project === undefined){
     //     project = createProject('Default');
     // }
@@ -1001,6 +1000,10 @@ function renderProject(project) {
         const main = document.getElementById('main');
         const placeholder = document.createElement('div');
         placeholder.textContent = 'Currently no projects';
+        placeholder.style.padding = '15px';
+        placeholder.style.fontSize = '2.0rem';
+        placeholder.style.fontStyle = 'italic';
+        placeholder.style.color = '#aaa';
         return main.appendChild(placeholder);
     }
     _lastOpenedProject = project.title;
@@ -1014,13 +1017,16 @@ function renderAllItems() {
     const main = document.getElementById('main');
     const itemContainer = document.createElement('div');
     itemContainer.id = 'all-items-container';
+    _currView = 'Task'
+    
 
     resetPage();
     for(let project of _projects){
-        project.items.map((item) => itemContainer.appendChild(createItemCardFlag(item)));
+        project.items.map((item) => itemContainer.appendChild(createItemCard(item)));
     }
     main.appendChild(itemContainer);
     // updatePage();
+    saveLocal();
 }
 
 // base
@@ -1222,7 +1228,7 @@ const updateSidebarMenu = () => {
 }
 
 function setWidthFromChars(input){
-    return input.style.width = (input.value.length-0.5) + 'ch';
+    return input.style.width = (input.value.length) + 'ch';
 }
 
 const updatePage = () => {
@@ -1239,12 +1245,14 @@ const updatePage = () => {
 const saveLocal = () => {
     localStorage.setItem('savedProjects', JSON.stringify(_projects))
     localStorage.setItem('lastOpenedProject', _lastOpenedProject)
+    localStorage.setItem('currView', _currView);
     console.log('saved local')
 }
 
 const restoreLocal = () => {
     const projects = JSON.parse(localStorage.getItem('savedProjects'))
     const lastOpenedProject = localStorage.getItem('lastOpenedProject');
+    const currView = localStorage.getItem('currView');
     if(projects){
         _projects = projects;
     } else {
@@ -1255,6 +1263,11 @@ const restoreLocal = () => {
         _lastOpenedProject = lastOpenedProject;
     } else {
         _lastOpenedProject = undefined;
+    }
+    if(currView){
+        _currView = currView;
+    } else {
+        _currView = 'Home';
     }
     updatePage();
     
