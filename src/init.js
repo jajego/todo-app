@@ -18,7 +18,6 @@ import logo from "../icons/himawari_logo_night_small.png"
 // When a task is completed in All tasks view, it should not render the project
 // Absolute positioning isn't working with px values as it depends on monitor
 // Make dueDate an actual date, and only format it when it's used
-// createProjectFlag function instead of being a whole other card function
 
 // FEATURE IDEAS
 // Home (Tasks due today, calendar, stats snapshot, projects summary) / This Week / Projects / Stats
@@ -174,6 +173,7 @@ function createItemCard(item) {
         flagContainer.appendChild(createProjectFlag(item));
     }
     itemCard.appendChild(flagContainer);
+    console.log(`item.dueDate is ${item.dueDate}`);
     return itemCard;
 }
 
@@ -196,7 +196,7 @@ function createProjectFlag(item) {
 }
 
 function createDateFlag(item) {
-    const dueDate = item.dueDate;
+    const dueDate = format(item.dueDate, "eee, " + "MMM " + "do");
     const flagContainer = document.createElement('div');
     flagContainer.classList.add('due-flag-container');
     const flag = document.createElement('div');
@@ -439,23 +439,21 @@ function createAppNav() {
     return projectCardNav;
 }
 
-
-
 function loadDemo() {
     const proj1 = createProject('Housework', 'blue');
     proj1.addToItems(createItem('Check in with contractors about renovations', 
-                                format((add(new Date(), {weeks: 1})), "eee, " + "MMM " + "do"),
+                                add(new Date(), {weeks: 1}),
                                 'Medium',
                                 'Housework'));
                                 
     proj1.addToItems(createItem('Clean out guestroom', 
-                                format((add(new Date(), {weeks: 4})), "eee, " + "MMM " + "do"),
+                                add(new Date(), {weeks: 4}),
                                 'Low',
                                 'Housework'));
 
     
     proj1.addToItems(createItem('Clean bathroom', 
-                                format((add(new Date(), {days: 4})), "eee, " + "MMM " + "do"),
+                                add(new Date(), {days: 4}),
                                 'High',
                                 'Housework'));
 
@@ -466,7 +464,7 @@ function loadDemo() {
                                 'Housework'));
                                 
     proj1.items.unshift(createItem('Get new belt for laundry machine', 
-                                format((add(new Date(), {days: 2})), "eee, " + "MMM " + "do "),
+                                add(new Date(), {days: 2}),
                                 'Critical',
                                 'Housework'));
 
@@ -479,12 +477,12 @@ function loadDemo() {
                                 'Birdbot v2.0'));
 
     proj2.addToItems(createItem('Come up with 5 potential names for the project', 
-                                format((add(new Date(), {months: 2, days: 5})), "eee, " + "MMM " + "do"),
+                                add(new Date(), {months: 2, days: 5}),
                                 'Medium',
                                 'Birdbot v2.0'));
 
     proj2.addToItems(createItem('Figure out Wikipedia vs. Google for image scraping', 
-                                format((add(new Date(), {weeks: 4})), "eee, " + "MMM " + "do"),
+                                add(new Date(), {weeks: 4}),
                                 'Low',
                                 'Birdbot v2.0'));
 
@@ -495,56 +493,57 @@ function loadDemo() {
 
 
     proj2.addToItems(createItem('Determine maximum number of API calls per day', 
-                                format((add(new Date(), {weeks: 1})), "eee, " + "MMM " + "do"),
+                                add(new Date(), {weeks: 1}),
                                 'High',
                                 'Birdbot v2.0'));
 
     
     proj2.addToItems(createItem('Book consultation with UX connect', 
-                                format((add(new Date(), {weeks: 4})), "eee, " + "MMM " + "do"),
+                                add(new Date(), {weeks: 4}),
                                 'Low',
                                 'Birdbot v2.0'));
 
     proj2.addToItems(createItem('Authentication?', 
-                                format((add(new Date(), {months: 2, days: 5})), "eee, " + "MMM " + "do"),
+                                add(new Date(), {months: 2, days: 5}),
                                 'Low',
                                 'Birdbot v2.0'));
 
         
     proj2.items.unshift(createItem('Research map interface options', 
-                                format((add(new Date(), {weeks: 1})), "eee, " + "MMM " + "do"),
+                                add(new Date(), {weeks: 1}),
                                 'Critical',
                                 'Birdbot v2.0'));
 
     proj2.addToItems(createItem('Design hats', 
-                                format((add(new Date(), {years: 1, months: 2, days: 5})), "eee, " + "MMM " + "do"),
+                                add(new Date(), {years: 1, months: 2, days: 5}),
                                 'Low',
                                 'Birdbot v2.0'));
 
     proj2.addToItems(createItem('Hosting budget', 
-                                format((add(new Date(), {years: 1})), "eee, " + "MMM " + "do"),
+                                add(new Date(), {years: 1}),
                                 'High',
                                 'Birdbot v2.0'));
 
         
     proj2.addToItems(createItem('Figure out how long to retain calls to db - session?', 
-                                format((add(new Date(), {weeks: 4})), "eee, " + "MMM " + "do"),
+                                 add(new Date(), {weeks: 4}),
+
                                 'Low',
                                 'Birdbot v2.0'));
 
     proj2.addToItems(createItem('Contact Angela', 
-                                format((add(new Date(), {months: 2, days: 5})), "eee, " + "MMM " + "do"),
+                                add(new Date(), {months: 2, days: 5}),
                                 'Low',
                                 'Birdbot v2.0'));
 
     proj2.addToItems(createItem('Finalize branding direction', 
-                                format((add(new Date(), {weeks: 1})), "eee, " + "MMM " + "do"),
+                                add(new Date(), {weeks: 1}),
                                 'High',
                                 'Birdbot v2.0'));
 
         
     proj2.addToItems(createItem('See what else people have done with the eBird API', 
-                                format((add(new Date(), {weeks: 4})), "eee, " + "MMM " + "do"),
+                                add(new Date(), {weeks: 4}),
                                 'Low',
                                 'Birdbot v2.0'));
 
@@ -872,15 +871,17 @@ function processProjectFormData() {
 
 function processItemFormData() {
     const title    = document.getElementById('new-item-title').value
-    let dueDate  = processCalendarFormData();
-    console.log('-----------------')
-    console.log(dueDate)
+    let dueDate = processCalendarFormData();
+    alert(`duedate is ${dueDate}`)
     if(dueDate){
-        dueDate = format(parseISO(dueDate), ("eee, " + "MMM " + "dd"));
+        alert('duedate is true');
+        // dueDate = format(parseISO(dueDate), ("eee, " + "MMM " + "dd"));
+        dueDate = parseISO(processCalendarFormData());
+    } else {
+        dueDate = '';
     }
     const priority = document.getElementById('priority-modal-input').value
     const project  = document.getElementById('selectProject').value
-
     return createItem(title, dueDate, priority, project)
 }
 
@@ -1265,6 +1266,14 @@ const restoreLocal = () => {
     const currView = localStorage.getItem('currView');
     if(projects){
         _projects = projects;
+        // localStorage cannot store objects, so the date property must be parsed
+        for(let project of _projects){
+            project.items.map((item) => {
+                if(item.dueDate !== ''){
+                    item.dueDate = parseISO(item.dueDate)
+                }
+                });
+        }
     } else {
         _projects = [];
     }
