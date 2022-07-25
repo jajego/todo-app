@@ -17,6 +17,8 @@ import logo from "../icons/himawari_logo_night_small.png"
 // Item modals + project modal all need fine tuning - close options, appearing in the right places, etc.
 // When a task is completed in All tasks view, it should not render the project
 // Absolute positioning isn't working with px values as it depends on monitor
+// Add 'Add project' button to Projects collapsible
+// Are they Tasks or are they Items?
 
 // FEATURE IDEAS
 // Home (Tasks due today, calendar, stats snapshot, projects summary) / This Week / Projects / Stats
@@ -37,12 +39,12 @@ import logo from "../icons/himawari_logo_night_small.png"
 // Himawari.io - sunflower theme - low priority = bud with one leaf, overdue tasks could have dying one
 // solros.io
 
-
-
-
 import {isAfter, format, getDay, parseISO, add} from 'date-fns';
 import { fi } from 'date-fns/locale';
 
+
+// CLASSES
+// ================================================================================================
 class Item {
     constructor(title, dueDate, priority, project) {
         this.title = title;
@@ -81,141 +83,182 @@ class Project {
     }
 }
 
+// GLOBAL DECLARATIONS
 let _projects = [];
 let _lastOpenedProject;
 // _currView will either be 'Project' or 'Tasks' or 'Stats' or 'Home'
 let _currView = 'project';
 
-function createItem(title, dueDate, priority, project) {
-    return new Item(title, dueDate, priority, project)
-}
-
-function createItemCard(item) {
-    const itemCard             = document.createElement('div');
-    const itemContentContainer = document.createElement('div');
-    const left                 = document.createElement('div');
-    const right                = document.createElement('div');
-    const flagContainer        = document.createElement('div');
-    const itemCompleteBtn      = document.createElement('div');
-    const itemTitle            = document.createElement('h4');
-    const itemDueDate          = document.createElement('p')
-    const itemPriority         = document.createElement('p')
-    const removeItemBtn        = document.createElement('div');
-    
-
-    itemCard.classList.add('item-card')
-    if(item.priority === 'Critical'){
-        itemCard.classList.add('item-critical')
-    }
-    left.classList.add('item-card-left') 
-    itemContentContainer.classList.add('item-card-content');
-    itemTitle.classList.add('item-title');
-    itemDueDate.classList.add('item-due-date');
-    itemPriority.classList.add('item-priority');
-    right.classList.add('item-card-right')
-    flagContainer.classList.add('item-card-flag-container')
-    itemCompleteBtn.classList.add('item-card-btn');
-    itemCompleteBtn.classList.add('item-complete-btn');
-    removeItemBtn.classList.add('item-remove-btn');
-    removeItemBtn.classList.add('item-card-btn');
-
-    itemCompleteBtn.addEventListener('click', () => {
-        completeItem(item)
-        itemCard.classList.add('item-card-complete')
-    })
-    if(item.priority === 'Low'){
-        itemCompleteBtn.classList.add('item-complete-btn-low')
-    }
-    if(item.priority === 'Medium'){
-        itemCompleteBtn.classList.add('item-complete-btn-medium')
-    }
-    if(item.priority === 'High'){
-        itemCompleteBtn.classList.add('item-complete-btn-high')
-    }
-    if(item.priority === 'Critical'){
-        itemCompleteBtn.classList.add('item-complete-btn-critical')
-    }
-
-    removeItemBtn.addEventListener('click', () => {
-        removeItem(item);
-    });
-
-    itemTitle.textContent = item.title;
-
-    // itemPriority.textContent = `Priority: ${item.priority}`;
-    
-
-    if(item.isComplete){
-        itemCard.classList.add('item-card-complete')
-    }
-    
-    const content = document.createElement('div');
-    content.classList = 'item-card-top';
-    
-    content.appendChild(left);
-    content.appendChild(right);
-    left.appendChild(itemCompleteBtn);
-    left.appendChild(itemContentContainer);
-    // right.appendChild(removeItemBtn);
-    right.appendChild(itemDueDate);
-    itemContentContainer.appendChild(itemTitle);
-    // itemContentContainer.appendChild(itemDueDate);
-    // itemContentContainer.appendChild(itemPriority);
-    itemCard.appendChild(content);
-
-    
-    if(item.dueDate !== ''){
-        // itemDueDate.textContent = `Due: ${item.dueDate}`;
-        flagContainer.appendChild(createDateFlag(item));
-    }
-    if(_currView === 'Task'){
-        flagContainer.appendChild(createProjectFlag(item));
-    }
-    itemCard.appendChild(flagContainer);
-    console.log(`item.dueDate is ${item.dueDate}`);
-    return itemCard;
-}
-
-function createProjectFlag(item) {
-    const flagContainer = document.createElement('div');
-    flagContainer.classList.add('project-flag-container');
-    const flag = document.createElement('div');
-    flag.classList.add('project-flag');
-    flag.textContent = item.project;
-    const flagIcon = document.createElement('div');
-    flagIcon.textContent = `🏷️`;
-    flagIcon.classList.add('item-card-flag-icon');
-    flagContainer.appendChild(flagIcon);
-    flagContainer.appendChild(flag);
-    flagContainer.addEventListener('click', () => {
-        renderProject(getProject(item.project));
-    })
-
-    return flagContainer;
-}
-
-function createDateFlag(item) {
-    const dueDate = format(item.dueDate, "eee, " + "MMM " + "do");
-    const flagContainer = document.createElement('div');
-    flagContainer.classList.add('due-flag-container');
-    const flag = document.createElement('div');
-    const flagIcon = document.createElement('div')
-    flagIcon.textContent = `⏲️ `;
-    flagIcon.classList.add('item-card-flag-icon');
-    flag.textContent = dueDate;
-    flag.classList.add('due-flag');
-    flagContainer.appendChild(flagIcon);
-    flagContainer.appendChild(flag);
-    return flagContainer;
-}
-
-
+// DATA - PROJECTS
 function createProject(title, color) {
     let project = new Project(title, color);
     
     return project;
 }
+function completeProject(projectToComplete) {
+    if(projectToComplete.isComplete){
+        return console.log('Project is already complete')
+    } else {
+        projectToComplete.isComplete = true;
+        for(let item of projectToComplete.items){
+            completeItem(item);
+        }
+        updatePage();
+    }
+}
+function removeProject(projectToRemove) {
+    _projects = _projects.filter(proj => proj.title !== projectToRemove.title)   
+}
+function getProject(title) {
+    return _projects.find((project) => project.title === title);
+}
+function sortProjects() {
+    for(let i = 0; i < _projects.length; i++){
+        if(_projects[i].isComplete){
+            _projects.push(_projects.splice(i, 1)[0])
+        }
+    }
+}
+function addProject(e) {
+    console.log('Adding project')
+    e.preventDefault();
+    const newProject = processProjectFormData();
+    newProject.color = document.getElementById('project-color-input').value;
+    console.log(newProject.color);
+    console.log('Successfully processed project form data')
+    _projects.push(newProject);
+    _lastOpenedProject = newProject.title;
+    updatePage();
 
+}
+
+// DATA - ITEMS
+function createItem(title, dueDate, priority, project) {
+    return new Item(title, dueDate, priority, project)
+}
+function removeItem(itemToRemove) {
+    const project = getProject(itemToRemove.project);
+        project.items = project.items.filter((item) => item.title !== itemToRemove.title);
+}
+function completeItem(itemToComplete) {
+    const project = getProject(itemToComplete.project);
+    console.log('-----------')
+    console.log(project)
+    // undo complete
+    if(itemToComplete.isComplete){
+        const firstIndex = findFirstCompletedItem(project);
+        itemToComplete.isComplete = false;
+        itemToComplete.completedDate = '';
+        // project.removeItem(itemToComplete);
+        removeItem(itemToComplete);
+        if(itemToComplete.priority === 'Critical'){
+            project.items.unshift(itemToComplete);
+        } else {
+        project.items.splice(firstIndex, 0, itemToComplete);
+        }
+
+    } else {
+        const indexOfItem = project.items.findIndex((item) => item.title === itemToComplete.title);
+        itemToComplete.isComplete = true;
+        itemToComplete.completedDate = new Date();
+        console.log(itemToComplete);
+    
+        project.items.push(project.items.splice(indexOfItem,1)[0])
+    }
+    updatePage();
+}
+function findFirstCompletedItem(project) {
+    const firstCompleted = project.items.find((item) => item.isComplete);
+    console.log('Found first completed: ' + firstCompleted);
+    if(!firstCompleted){
+        return null;
+    }
+    const indexOfItem = project.items.findIndex((item) => item.title === firstCompleted.title);
+    console.log(indexOfItem);
+    return indexOfItem;
+}
+function getNumberOfCompletedItems(project){
+    return project.items.filter((item) => item.isComplete).length;
+}
+function addItem(e) {
+    e.preventDefault();
+    const newItem = processItemFormData();
+    console.log('Succsesfully processed item form data')
+    const project = getProject(newItem.project);
+    let indexOfProject = _projects.findIndex((project) => project.title == newItem.project);
+    if(newItem.priority === 'Critical'){
+        _projects[indexOfProject].items.unshift(newItem)
+        resetForms();
+        updatePage();
+        return;
+    }  
+    
+    const firstIndex = findFirstCompletedItem(_projects[indexOfProject]);
+    console.log(`First completed index is ${firstIndex}`)
+    if(firstIndex !== null){
+        if(firstIndex == 0 || firstIndex == -1) {
+            console.log('UNSHIFITNG')
+            _projects[indexOfProject].items.unshift(newItem)
+        } else {
+            console.log('SPLICING')
+            _projects[indexOfProject].items.splice(firstIndex, 0, newItem);
+        }
+    } else {
+        console.log('PUSHING')
+        _projects[indexOfProject].items.push(newItem);
+    }
+    
+    resetForms();
+    updatePage();
+
+    // closeAddItemModal();
+}
+
+// HTML - HOME
+function renderHome() {
+    const main = document.getElementById('main');
+    const home = document.createElement('div');
+    home.id = 'home';
+    resetPage();
+    _currView = 'Home';
+    if(_projects.length === 0) {
+        home.appendChild(createPlaceholder());
+    } else {
+        home.appendChild(createProjectsSummary());
+    }
+    main.appendChild(home);
+    saveLocal();
+}
+function createPlaceholder() {
+    const placeholder = document.createElement('div');
+    placeholder.textContent = 'Currently no projects';
+    placeholder.style.padding = '15px';
+    placeholder.style.fontSize = '2.0rem';
+    placeholder.style.fontStyle = 'italic';
+    placeholder.style.color = '#aaa';
+    return placeholder;
+}
+function createProjectsSummary() {
+    const main = document.getElementById('main');
+    const summary = document.createElement('div');
+    summary.id = 'projects-summary';
+    const summaryHeader = document.createElement('p');
+    summaryHeader.id = 'projects-summary-header';
+    summaryHeader.textContent = 'Projects summary:'
+    const cardContainer = document.createElement('div');
+    cardContainer.id = 'project-cards-container';
+    for(let project of _projects){
+        cardContainer.appendChild(createProjectSummaryCard(project));
+    }
+    summary.appendChild(summaryHeader);
+    summary.appendChild(cardContainer);
+    return summary;
+}
+function createQueue() {
+}
+
+// HTML - PROJECTS
+// ================================================================================================
 function createProjectCard(project) {
     const projectCard = document.createElement('div');
     const projectCardHeader = document.createElement('div');
@@ -337,107 +380,522 @@ function createProjectCard(project) {
 
     return projectCard;
 }
+function createProjectSummaryCard(project) {
+    const card = document.createElement('div');
+    card.classList.add('project-card-mini');
+    card.style.border = `2px dotted ${project.color}`;
 
-function completeProject(projectToComplete) {
-    if(projectToComplete.isComplete){
-        return console.log('Project is already complete')
-    } else {
-        projectToComplete.isComplete = true;
-        for(let item of projectToComplete.items){
-            completeItem(item);
-        }
-        updatePage();
+    const title = document.createElement('p');
+    title.classList.add('project-card-mini-title');
+    title.textContent = `Project: ${project.title}`;
+
+    const number = document.createElement('div');
+    number.classList.add('project-card-mini-number');
+    number.textContent = `Tasks: ${project.items.length}`;
+
+    card.appendChild(title);
+    card.appendChild(number);
+    card.addEventListener('click', () => {
+        renderProject(project);
+    })
+    return card;
+}
+function renderProject(project) {
+    resetPage();
+    _currView = 'Project';
+    // if(project === undefined){
+    //     project = createProject('Default');
+    // }
+    if(!project){
+        const main = document.getElementById('main');
+        const placeholder = document.createElement('div');
+        placeholder.textContent = 'Currently no projects';
+        placeholder.style.padding = '15px';
+        placeholder.style.fontSize = '2.0rem';
+        placeholder.style.fontStyle = 'italic';
+        placeholder.style.color = '#aaa';
+        return main.appendChild(placeholder);
     }
+    _lastOpenedProject = project.title;
+
+    const main = document.getElementById('main');
+    main.appendChild(createProjectCard(project));
+    saveLocal();
 }
 
-function completeItem(itemToComplete) {
-    const project = getProject(itemToComplete.project);
-    console.log('-----------')
-    console.log(project)
-    // undo complete
-    if(itemToComplete.isComplete){
-        const firstIndex = findFirstCompletedItem(project);
-        itemToComplete.isComplete = false;
-        itemToComplete.completedDate = '';
-        // project.removeItem(itemToComplete);
-        removeItem(itemToComplete);
-        if(itemToComplete.priority === 'Critical'){
-            project.items.unshift(itemToComplete);
-        } else {
-        project.items.splice(firstIndex, 0, itemToComplete);
-        }
-
-    } else {
-        const indexOfItem = project.items.findIndex((item) => item.title === itemToComplete.title);
-        itemToComplete.isComplete = true;
-        itemToComplete.completedDate = new Date();
-        console.log(itemToComplete);
+// HTML - ITEMS
+// ================================================================================================
+function createItemCard(item) {
+    const itemCard             = document.createElement('div');
+    const itemContentContainer = document.createElement('div');
+    const left                 = document.createElement('div');
+    const right                = document.createElement('div');
+    const flagContainer        = document.createElement('div');
+    const itemCompleteBtn      = document.createElement('div');
+    const itemTitle            = document.createElement('h4');
+    const itemDueDate          = document.createElement('p')
+    const itemPriority         = document.createElement('p')
+    const removeItemBtn        = document.createElement('div');
     
-        project.items.push(project.items.splice(indexOfItem,1)[0])
+
+    itemCard.classList.add('item-card')
+    if(item.priority === 'Critical'){
+        itemCard.classList.add('item-critical')
     }
-    updatePage();
+    left.classList.add('item-card-left') 
+    itemContentContainer.classList.add('item-card-content');
+    itemTitle.classList.add('item-title');
+    itemDueDate.classList.add('item-due-date');
+    itemPriority.classList.add('item-priority');
+    right.classList.add('item-card-right')
+    flagContainer.classList.add('item-card-flag-container')
+    itemCompleteBtn.classList.add('item-card-btn');
+    itemCompleteBtn.classList.add('item-complete-btn');
+    removeItemBtn.classList.add('item-remove-btn');
+    removeItemBtn.classList.add('item-card-btn');
+
+    itemCompleteBtn.addEventListener('click', () => {
+        completeItem(item)
+        itemCard.classList.add('item-card-complete')
+    })
+    if(item.priority === 'Low'){
+        itemCompleteBtn.classList.add('item-complete-btn-low')
+    }
+    if(item.priority === 'Medium'){
+        itemCompleteBtn.classList.add('item-complete-btn-medium')
+    }
+    if(item.priority === 'High'){
+        itemCompleteBtn.classList.add('item-complete-btn-high')
+    }
+    if(item.priority === 'Critical'){
+        itemCompleteBtn.classList.add('item-complete-btn-critical')
+    }
+
+    removeItemBtn.addEventListener('click', () => {
+        removeItem(item);
+    });
+
+    itemTitle.textContent = item.title;
+
+    // itemPriority.textContent = `Priority: ${item.priority}`;
+    
+
+    if(item.isComplete){
+        itemCard.classList.add('item-card-complete')
+    }
+    
+    const content = document.createElement('div');
+    content.classList = 'item-card-top';
+    
+    content.appendChild(left);
+    content.appendChild(right);
+    left.appendChild(itemCompleteBtn);
+    left.appendChild(itemContentContainer);
+    // right.appendChild(removeItemBtn);
+    right.appendChild(itemDueDate);
+    itemContentContainer.appendChild(itemTitle);
+    // itemContentContainer.appendChild(itemDueDate);
+    // itemContentContainer.appendChild(itemPriority);
+    itemCard.appendChild(content);
+
+    
+    if(item.dueDate !== ''){
+        // itemDueDate.textContent = `Due: ${item.dueDate}`;
+        flagContainer.appendChild(createDateFlag(item));
+    }
+    if(_currView === 'Task'){
+        flagContainer.appendChild(createProjectFlag(item));
+    }
+    itemCard.appendChild(flagContainer);
+    console.log(`item.dueDate is ${item.dueDate}`);
+    return itemCard;
+}
+function renderAllItems() {
+    const main = document.getElementById('main');
+    const itemContainer = document.createElement('div');
+    itemContainer.id = 'all-items-container';
+    _currView = 'Task'
+    
+
+    resetPage();
+    for(let project of _projects){
+        project.items.map((item) => itemContainer.appendChild(createItemCard(item)));
+    }
+    main.appendChild(itemContainer);
+    // updatePage();
+    saveLocal();
 }
 
-function findFirstCompletedItem(project) {
-    const firstCompleted = project.items.find((item) => item.isComplete);
-    console.log('Found first completed: ' + firstCompleted);
-    if(!firstCompleted){
-        return null;
-    }
-    const indexOfItem = project.items.findIndex((item) => item.title === firstCompleted.title);
-    console.log(indexOfItem);
-    return indexOfItem;
+// HTML - CARD FLAGS
+// ================================================================================================
+function createProjectFlag(item) {
+    const flagContainer = document.createElement('div');
+    flagContainer.classList.add('project-flag-container');
+    const flag = document.createElement('div');
+    flag.classList.add('project-flag');
+    flag.textContent = item.project;
+    const flagIcon = document.createElement('div');
+    flagIcon.textContent = `🏷️`;
+    flagIcon.classList.add('item-card-flag-icon');
+    flagContainer.appendChild(flagIcon);
+    flagContainer.appendChild(flag);
+    flagContainer.addEventListener('click', () => {
+        renderProject(getProject(item.project));
+    })
+
+    return flagContainer;
+}
+function createDateFlag(item) {
+    const dueDate = format(item.dueDate, "eee, " + "MMM " + "do");
+    const flagContainer = document.createElement('div');
+    flagContainer.classList.add('due-flag-container');
+    const flag = document.createElement('div');
+    const flagIcon = document.createElement('div')
+    flagIcon.textContent = `⏲️ `;
+    flagIcon.classList.add('item-card-flag-icon');
+    flag.textContent = dueDate;
+    flag.classList.add('due-flag');
+    flagContainer.appendChild(flagIcon);
+    flagContainer.appendChild(flag);
+    return flagContainer;
 }
 
-function createAppNav() {
-    const addItemModal = document.getElementById('add-item-modal');
-    const projectCardNav = document.createElement('nav');
+// HTML - SIDEBAR
+// ================================================================================================
+function updateDropdown() {
+    const dropdown = document.getElementById('selectProject');
+    dropdown.innerHTML = '';
+    _projects.map((project) => {
+        if(!project.isComplete){
+            const option = document.createElement('option');
+            option.value = project.title;
+            option.innerText = project.title;
+            dropdown.appendChild(option);
+        }
+    })
+}
+function makeProjectBold(){
+    // Currently broken
+    const projects = document.getElementsByClassName('sidebar-projects-dropdown-option');
+    for(let i = 0; i < projects.length; i++){
+        projects[i].classList.remove('sidebar-projects-dropdown-option-active');
+        console.log(projects[i]);
+        if(_currView === 'Project' && projects[i].textContent == _lastOpenedProject){
+            projects[i].classList.add('sidebar-projects-dropdown-option-active')
+        }
+    }
+}
+const updateSidebarMenu = () => {
+    const sidebarMenu = document.getElementById('sidebar-menus-container');
+    if(sidebarMenu === null){
+        return createSidebarMenus;
+    } else {
+        sidebarMenu.innerHTML = '';
+        createSidebarMenus();
+    }
+}
 
-    const addProjectBtn = document.createElement('button');
-    const addItemBtn = document.createElement('button');
+// HTML - MODALS/FORMS
+// ================================================================================================
+function createAddProjectModal() {
+    const addProjectModal = document.createElement('div');
+    addProjectModal.classList.add('modal');
+    addProjectModal.id = 'add-project-modal';
 
-    addProjectBtn.classList.add('add-project-btn');
-    addProjectBtn.innerHTML = 'New project';
-    addProjectBtn.addEventListener('click', () => {
-        const addProjectModal = document.getElementById('add-project-modal');
-        addProjectModal.classList.toggle('modal-active');
-        if(addProjectModal.style.display === 'flex') {
-            addProjectModal.style.display = 'none';
+    const addProjectForm = document.createElement('form');
+    addProjectForm.id = 'add-project-form';
+
+    const projectTitleLabel = document.createElement('label');
+    projectTitleLabel.id = 'new-project-title'
+    projectTitleLabel.innerText = 'Title:'
+
+    const projectTitleInput = document.createElement('input');
+    projectTitleInput.type = 'text';
+    projectTitleInput.id = 'project-title-input';
+    projectTitleInput.name = 'new-project-title';
+
+    const projectColorLabel = document.createElement('label');
+    projectColorLabel.id = 'new-project-color'
+    projectColorLabel.innerText = 'Color: '
+
+    const projectColorInput = document.createElement('input');
+    projectColorInput.type = 'color';
+    projectColorInput.id = 'project-color-input';
+    projectColorInput.name = 'new-project-color';
+
+    const submitBtn = document.createElement('button');
+    submitBtn.type = 'submit';
+    submitBtn.innerText = 'Submit';
+
+    addProjectForm.appendChild(projectTitleLabel)
+    addProjectForm.appendChild(projectTitleInput)
+    addProjectForm.appendChild(projectColorLabel);
+    addProjectForm.appendChild(projectColorInput);
+    addProjectForm.appendChild(submitBtn);
+
+    addProjectForm.onsubmit = addProject;
+
+    addProjectModal.appendChild(addProjectForm);
+
+    return addProjectModal;
+}
+function createAddItemModal2() {
+    const addItemModal = document.createElement('div');
+    addItemModal.classList.add('modal');
+    addItemModal.id       = 'add-item-modal';
+
+    const addItemForm = document.createElement('form');
+    addItemForm.id = 'add-item-form';
+
+    const formTop = document.createElement('div');
+    formTop.id = 'add-item-form-top';
+    const formBottom = document.createElement('div');
+    formBottom.id = 'add-item-form-bottom';
+   
+    const itemTitleInput     = document.createElement('input');
+    itemTitleInput.type      = 'text';
+    itemTitleInput.id        = 'new-item-title';
+    itemTitleInput.name      = 'itemTitle';
+    itemTitleInput.placeholder = `To do`
+
+    const calendarBtn = document.createElement('div');
+    const calendarImg = document.createElement('img');
+    calendarImg.src = calendarIcon;
+    calendarImg.width = '30';
+    calendarImg.height = '30';
+    calendarBtn.appendChild(calendarImg);
+    // calendarBtn.textContent = '📅';
+    // calendarBtn.innerHTML = new Image(calendarIcon);
+    calendarBtn.classList.add('modal-button')
+    calendarBtn.id = 'calendar-modal-calendar-btn';
+    calendarBtn.addEventListener('click', () => {
+        const calendarModal = document.getElementById('calendar-modal');
+        calendarModal.classList.toggle('calendar-modal-active');
+        if(calendarModal.style.display === 'block'){
+            calendarModal.style.display = 'none';
         } else {
-            addProjectModal.style.display = 'flex';
+            calendarModal.style.display = 'block';
+        }
+    })
+    const priorityModal = createPriorityModal();
+    addItemModal.appendChild(priorityModal);
+
+    const priorityBtn = document.createElement('div');
+    priorityBtn.classList.add('modal-button')
+    const priorityImg = document.createElement('img');
+    priorityImg.src = priorityIcon;
+    priorityImg.width = '30';
+    priorityImg.height = '30';
+    priorityBtn.appendChild(priorityImg);
+
+    priorityBtn.id = 'priority-modal-priority-btn';
+    priorityBtn.addEventListener('click', () => {
+        priorityModal.classList.toggle('priority-modal-active');
+        if(priorityModal.style.display === 'block'){
+            priorityModal.style.display = 'none';
+        } else {
+            priorityModal.style.display = 'block';
         }
     })
 
-    const left = document.createElement('div');
-    left.id = 'header-left';
-    left.classList.add('header-section')
-    const right = document.createElement('div');
-    right.id = 'header-right';
-    right.classList.add('header-section');
+    const submitBtn = document.createElement('button');
+    submitBtn.type = 'submit';
+    submitBtn.id = 'item-modal-submit-btn'
+    submitBtn.innerText = 'Add task'
 
-    const loadDemoBtn = document.createElement('button');
-    loadDemoBtn.classList.add('header-button');
-    loadDemoBtn.innerHTML = 'Load demo';
-    loadDemoBtn.addEventListener('click', loadDemo);
+    const project = document.createElement('input');
+    project.type = 'text';
+    project.id = 'selectProject';
+    project.classList.add('no-display');
+    project.value = _lastOpenedProject;
+
+    addItemForm.appendChild(project);
+    formTop.appendChild(itemTitleInput);
+    formBottom.appendChild(calendarBtn);
+    formBottom.appendChild(priorityBtn);
+    formBottom.appendChild(submitBtn);
+    addItemForm.appendChild(formTop);   
+    addItemForm.appendChild(formBottom);
+
+    addItemForm.onsubmit = addItem;
+    addItemModal.appendChild(addItemForm);
     
+    return addItemModal;
+}
+function createCalendarModal() {
+    const modal = document.createElement('div');
+    modal.id = 'calendar-modal';
+    const form = document.createElement('form');
+    form.id = 'calendar-form';
 
-    const clearLocalStorageBtn = document.createElement('button');
-    clearLocalStorageBtn.classList.add('clear-local-storage-btn');
-    clearLocalStorageBtn.innerHTML = 'Clear localStorage'
-    clearLocalStorageBtn.addEventListener('click', () => {
-        localStorage.clear();
-        console.log('localStorage cleared')
+    let dueDate;
+
+    const btnContainer = document.createElement('div');
+    btnContainer.id = 'calendar-modal-btn-container';
+
+    const calendar = document.createElement('input');
+    calendar.type = 'date';
+    calendar.id = 'modal-calendar';
+    calendar.placeholder = 'Due date';
+    calendar.addEventListener('click', () => {closeModal(modal)})
+
+    const todayBtn = document.createElement('button');
+    todayBtn.textContent = 'Today'
+    todayBtn.type = 'button';
+    todayBtn.id = 'today-btn';
+    todayBtn.value = 'today';
+    todayBtn.addEventListener('click', () => {
+        todayBtn.classList.toggle('active');
+        calendar.value = format(new Date(), 'yyyy' + '-' + 'MM' + '-' + 'dd');
+        closeModal(modal)
     })
-    left.appendChild(addProjectBtn);
-    left.appendChild(createAddProjectModal())
-    projectCardNav.appendChild(left);
-    right.appendChild(loadDemoBtn);
-    right.appendChild(clearLocalStorageBtn);
-    projectCardNav.appendChild(right);
 
-    return projectCardNav;
+    const tomorrowBtn = document.createElement('button');
+    tomorrowBtn.textContent = 'Tomorrow';
+    tomorrowBtn.type = 'button';
+    tomorrowBtn.id = 'tomorrow-btn';
+    tomorrowBtn.value = 'tomorrrow';
+    tomorrowBtn.addEventListener('click', () => {
+        tomorrowBtn.classList.toggle('active');
+        calendar.value = format((add(new Date(), {days: 1})), 'yyyy' + '-' + 'MM' + '-' + 'dd');
+        closeModal(modal)
+
+    })
+
+    const nextWeekBtn = document.createElement('button');
+    nextWeekBtn.textContent = 'Next week'
+    nextWeekBtn.type = 'button';
+    nextWeekBtn.id = 'next-week-btn';
+    nextWeekBtn.value = 'next-week';
+    nextWeekBtn.addEventListener('click', () => {
+        nextWeekBtn.classList.toggle('active');
+        calendar.value = format((add(new Date(), {weeks: 1})), 'yyyy' + '-' + 'MM' + '-' + 'dd');    
+        closeModal(modal);
+        console.log('hi');
+    })
+
+    btnContainer.appendChild(todayBtn);
+    btnContainer.appendChild(tomorrowBtn);
+    btnContainer.appendChild(nextWeekBtn);
+    form.appendChild(btnContainer);
+    form.appendChild(calendar);
+    modal.appendChild(form);
+
+    return modal;
+}
+function createPriorityModal() {
+    const modal = document.createElement('div');
+    modal.id = 'priority-modal';
+    const form = document.createElement('form');
+    form.id = 'priority-form';
+
+    const priorityInput = document.createElement('input');
+    priorityInput.classList.add('no-display');
+    priorityInput.id = 'priority-modal-input';
+
+    const btnContainer = document.createElement('div');
+    btnContainer.id = 'priority-modal-btn-container';
+
+    const lowBtn = document.createElement('button');
+    lowBtn.type = 'button';
+    lowBtn.textContent = 'Low';
+    lowBtn.classList.add('priority-modal-btn');
+    lowBtn.id = 'priority-modal-low-btn';
+    lowBtn.addEventListener('click', () => {
+        priorityInput.value = 'Low';
+        closeModal(modal);
+    })
+    
+    const mediumBtn = document.createElement('button');
+    mediumBtn.type = 'button';
+    mediumBtn.textContent = 'Medium';
+
+    mediumBtn.classList.add('priority-modal-btn');
+    mediumBtn.id = 'priority-modal-medium-btn';
+    mediumBtn.addEventListener('click', () => {
+        priorityInput.value = 'Medium';
+        closeModal(modal);
+
+    })
+    
+    const highBtn = document.createElement('button');
+    highBtn.type = 'button';
+    highBtn.textContent = 'High';
+
+    highBtn.classList.add('priority-modal-btn');
+    highBtn.id = 'priority-modal-high-btn';
+    highBtn.addEventListener('click', () => {
+        priorityInput.value = 'High';
+        closeModal(modal);
+
+    })
+    
+    const criticalBtn = document.createElement('button');
+    criticalBtn.type = 'button';
+    criticalBtn.textContent = 'Critical';
+
+    criticalBtn.classList.add('priority-modal-btn');
+    criticalBtn.id = 'priority-modal-critical-btn';
+    criticalBtn.addEventListener('click', () => {
+        priorityInput.value = 'Critical';
+        closeModal(modal);
+    })
+
+    form.appendChild(priorityInput);
+    btnContainer.appendChild(lowBtn);
+    btnContainer.appendChild(mediumBtn);
+    btnContainer.appendChild(highBtn);
+    btnContainer.appendChild(criticalBtn);
+    form.appendChild(btnContainer);
+    modal.appendChild(form);
+
+    return modal;
+}
+function closeModal(modal) {
+    modal.classList.remove(`${modal.id}-active`);
+    modal.style.display = 'none';
+}
+function resetForms() {
+    const addItemForm = document.getElementById('add-item-form');
+    const addProjectForm = document.getElementById('add-project-form');
+
+    addItemForm.reset();
+    addProjectForm.reset();
+}
+function processProjectFormData() {
+    const title = document.getElementById('project-title-input').value;
+    const color = document.getElementById('project-color-input').value;
+    return createProject(title, color)
+}
+function processItemFormData() {
+    const title    = document.getElementById('new-item-title').value
+    let dueDate = processCalendarFormData();
+    alert(`duedate is ${dueDate}`)
+    if(dueDate){
+        alert('duedate is true');
+        // dueDate = format(parseISO(dueDate), ("eee, " + "MMM " + "dd"));
+        dueDate = parseISO(processCalendarFormData());
+    } else {
+        dueDate = '';
+    }
+    const priority = document.getElementById('priority-modal-input').value
+    const project  = document.getElementById('selectProject').value
+    return createItem(title, dueDate, priority, project)
+}
+function processCalendarFormData() {
+    const date = document.getElementById('modal-calendar').value;
+    // if(date) {
+    //     date = format(parseISO(dueDate), ("eee, " + "MMM " + "dd"));
+    // }
+    return date;
 }
 
+// HTML UTILITY
+// ================================================================================================
+function resetPage() {
+    const main = document.getElementById('main');
+    main.innerHTML = '';
+}
 function loadDemo() {
     const proj1 = createProject('Housework', 'blue');
     proj1.addToItems(createItem('Check in with contractors about renovations', 
@@ -568,530 +1026,66 @@ function loadDemo() {
     makeProjectBold();
 
 }
-
-function resetPage() {
-    const main = document.getElementById('main');
-    main.innerHTML = '';
+function setWidthFromChars(input){
+    return input.style.width = (input.value.length) + 'ch';
 }
-
-function updateDropdown() {
-    const dropdown = document.getElementById('selectProject');
-    dropdown.innerHTML = '';
-    _projects.map((project) => {
-        if(!project.isComplete){
-            const option = document.createElement('option');
-            option.value = project.title;
-            option.innerText = project.title;
-            dropdown.appendChild(option);
-        }
-    })
-}
-
-function createAddProjectModal() {
-    const addProjectModal = document.createElement('div');
-    addProjectModal.classList.add('modal');
-    addProjectModal.id = 'add-project-modal';
-
-    const addProjectForm = document.createElement('form');
-    addProjectForm.id = 'add-project-form';
-
-    const projectTitleLabel = document.createElement('label');
-    projectTitleLabel.id = 'new-project-title'
-    projectTitleLabel.innerText = 'Title:'
-
-    const projectTitleInput = document.createElement('input');
-    projectTitleInput.type = 'text';
-    projectTitleInput.id = 'project-title-input';
-    projectTitleInput.name = 'new-project-title';
-
-    const projectColorLabel = document.createElement('label');
-    projectColorLabel.id = 'new-project-color'
-    projectColorLabel.innerText = 'Color: '
-
-    const projectColorInput = document.createElement('input');
-    projectColorInput.type = 'color';
-    projectColorInput.id = 'project-color-input';
-    projectColorInput.name = 'new-project-color';
-
-    const submitBtn = document.createElement('button');
-    submitBtn.type = 'submit';
-    submitBtn.innerText = 'Submit';
-
-    addProjectForm.appendChild(projectTitleLabel)
-    addProjectForm.appendChild(projectTitleInput)
-    addProjectForm.appendChild(projectColorLabel);
-    addProjectForm.appendChild(projectColorInput);
-    addProjectForm.appendChild(submitBtn);
-
-    addProjectForm.onsubmit = addProject;
-
-    addProjectModal.appendChild(addProjectForm);
-
-    return addProjectModal;
-}
-
-function createAddItemModal2() {
-    const addItemModal = document.createElement('div');
-    addItemModal.classList.add('modal');
-    addItemModal.id       = 'add-item-modal';
-
-    const addItemForm = document.createElement('form');
-    addItemForm.id = 'add-item-form';
-
-    const formTop = document.createElement('div');
-    formTop.id = 'add-item-form-top';
-    const formBottom = document.createElement('div');
-    formBottom.id = 'add-item-form-bottom';
-   
-    const itemTitleInput     = document.createElement('input');
-    itemTitleInput.type      = 'text';
-    itemTitleInput.id        = 'new-item-title';
-    itemTitleInput.name      = 'itemTitle';
-    itemTitleInput.placeholder = `To do`
-
-    const calendarBtn = document.createElement('div');
-    const calendarImg = document.createElement('img');
-    calendarImg.src = calendarIcon;
-    calendarImg.width = '30';
-    calendarImg.height = '30';
-    calendarBtn.appendChild(calendarImg);
-    // calendarBtn.textContent = '📅';
-    // calendarBtn.innerHTML = new Image(calendarIcon);
-    calendarBtn.classList.add('modal-button')
-    calendarBtn.id = 'calendar-modal-calendar-btn';
-    calendarBtn.addEventListener('click', () => {
-        const calendarModal = document.getElementById('calendar-modal');
-        calendarModal.classList.toggle('calendar-modal-active');
-        if(calendarModal.style.display === 'block'){
-            calendarModal.style.display = 'none';
-        } else {
-            calendarModal.style.display = 'block';
-        }
-    })
-    const priorityModal = createPriorityModal();
-    addItemModal.appendChild(priorityModal);
-
-    const priorityBtn = document.createElement('div');
-    priorityBtn.classList.add('modal-button')
-    const priorityImg = document.createElement('img');
-    priorityImg.src = priorityIcon;
-    priorityImg.width = '30';
-    priorityImg.height = '30';
-    priorityBtn.appendChild(priorityImg);
-
-    priorityBtn.id = 'priority-modal-priority-btn';
-    priorityBtn.addEventListener('click', () => {
-        priorityModal.classList.toggle('priority-modal-active');
-        if(priorityModal.style.display === 'block'){
-            priorityModal.style.display = 'none';
-        } else {
-            priorityModal.style.display = 'block';
-        }
-    })
-
-    const submitBtn = document.createElement('button');
-    submitBtn.type = 'submit';
-    submitBtn.id = 'item-modal-submit-btn'
-    submitBtn.innerText = 'Add task'
-
-    const project = document.createElement('input');
-    project.type = 'text';
-    project.id = 'selectProject';
-    project.classList.add('no-display');
-    project.value = _lastOpenedProject;
-
-    addItemForm.appendChild(project);
-    formTop.appendChild(itemTitleInput);
-    formBottom.appendChild(calendarBtn);
-    formBottom.appendChild(priorityBtn);
-    formBottom.appendChild(submitBtn);
-    addItemForm.appendChild(formTop);   
-    addItemForm.appendChild(formBottom);
-
-    addItemForm.onsubmit = addItem;
-    addItemModal.appendChild(addItemForm);
-    
-    return addItemModal;
-}
-
-function createCalendarModal() {
-    const modal = document.createElement('div');
-    modal.id = 'calendar-modal';
-    const form = document.createElement('form');
-    form.id = 'calendar-form';
-
-    let dueDate;
-
-    const btnContainer = document.createElement('div');
-    btnContainer.id = 'calendar-modal-btn-container';
-
-    const calendar = document.createElement('input');
-    calendar.type = 'date';
-    calendar.id = 'modal-calendar';
-    calendar.placeholder = 'Due date';
-    calendar.addEventListener('click', () => {closeModal(modal)})
-
-    const todayBtn = document.createElement('button');
-    todayBtn.textContent = 'Today'
-    todayBtn.type = 'button';
-    todayBtn.id = 'today-btn';
-    todayBtn.value = 'today';
-    todayBtn.addEventListener('click', () => {
-        todayBtn.classList.toggle('active');
-        calendar.value = format(new Date(), 'yyyy' + '-' + 'MM' + '-' + 'dd');
-        closeModal(modal)
-    })
-
-    const tomorrowBtn = document.createElement('button');
-    tomorrowBtn.textContent = 'Tomorrow';
-    tomorrowBtn.type = 'button';
-    tomorrowBtn.id = 'tomorrow-btn';
-    tomorrowBtn.value = 'tomorrrow';
-    tomorrowBtn.addEventListener('click', () => {
-        tomorrowBtn.classList.toggle('active');
-        calendar.value = format((add(new Date(), {days: 1})), 'yyyy' + '-' + 'MM' + '-' + 'dd');
-        closeModal(modal)
-
-    })
-
-    const nextWeekBtn = document.createElement('button');
-    nextWeekBtn.textContent = 'Next week'
-    nextWeekBtn.type = 'button';
-    nextWeekBtn.id = 'next-week-btn';
-    nextWeekBtn.value = 'next-week';
-    nextWeekBtn.addEventListener('click', () => {
-        nextWeekBtn.classList.toggle('active');
-        calendar.value = format((add(new Date(), {weeks: 1})), 'yyyy' + '-' + 'MM' + '-' + 'dd');    
-        closeModal(modal);
-        console.log('hi');
-    })
-
-    btnContainer.appendChild(todayBtn);
-    btnContainer.appendChild(tomorrowBtn);
-    btnContainer.appendChild(nextWeekBtn);
-    form.appendChild(btnContainer);
-    form.appendChild(calendar);
-    modal.appendChild(form);
-
-    return modal;
-}
-
-function createPriorityModal() {
-    const modal = document.createElement('div');
-    modal.id = 'priority-modal';
-    const form = document.createElement('form');
-    form.id = 'priority-form';
-
-    const priorityInput = document.createElement('input');
-    priorityInput.classList.add('no-display');
-    priorityInput.id = 'priority-modal-input';
-
-    const btnContainer = document.createElement('div');
-    btnContainer.id = 'priority-modal-btn-container';
-
-    const lowBtn = document.createElement('button');
-    lowBtn.type = 'button';
-    lowBtn.textContent = 'Low';
-    lowBtn.classList.add('priority-modal-btn');
-    lowBtn.id = 'priority-modal-low-btn';
-    lowBtn.addEventListener('click', () => {
-        priorityInput.value = 'Low';
-        closeModal(modal);
-    })
-    
-    const mediumBtn = document.createElement('button');
-    mediumBtn.type = 'button';
-    mediumBtn.textContent = 'Medium';
-
-    mediumBtn.classList.add('priority-modal-btn');
-    mediumBtn.id = 'priority-modal-medium-btn';
-    mediumBtn.addEventListener('click', () => {
-        priorityInput.value = 'Medium';
-        closeModal(modal);
-
-    })
-    
-    const highBtn = document.createElement('button');
-    highBtn.type = 'button';
-    highBtn.textContent = 'High';
-
-    highBtn.classList.add('priority-modal-btn');
-    highBtn.id = 'priority-modal-high-btn';
-    highBtn.addEventListener('click', () => {
-        priorityInput.value = 'High';
-        closeModal(modal);
-
-    })
-    
-    const criticalBtn = document.createElement('button');
-    criticalBtn.type = 'button';
-    criticalBtn.textContent = 'Critical';
-
-    criticalBtn.classList.add('priority-modal-btn');
-    criticalBtn.id = 'priority-modal-critical-btn';
-    criticalBtn.addEventListener('click', () => {
-        priorityInput.value = 'Critical';
-        closeModal(modal);
-    })
-
-    form.appendChild(priorityInput);
-    btnContainer.appendChild(lowBtn);
-    btnContainer.appendChild(mediumBtn);
-    btnContainer.appendChild(highBtn);
-    btnContainer.appendChild(criticalBtn);
-    form.appendChild(btnContainer);
-    modal.appendChild(form);
-
-    return modal;
-}
-
-
-
-// process item form 2
-
-function closeModal(modal) {
-    modal.classList.remove(`${modal.id}-active`);
-    modal.style.display = 'none';
-}
-
-function resetForms() {
-    const addItemForm = document.getElementById('add-item-form');
-    const addProjectForm = document.getElementById('add-project-form');
-
-    addItemForm.reset();
-    addProjectForm.reset();
-}
-
-function processProjectFormData() {
-    const title = document.getElementById('project-title-input').value;
-    const color = document.getElementById('project-color-input').value;
-    return createProject(title, color)
-}
-
-function processItemFormData() {
-    const title    = document.getElementById('new-item-title').value
-    let dueDate = processCalendarFormData();
-    alert(`duedate is ${dueDate}`)
-    if(dueDate){
-        alert('duedate is true');
-        // dueDate = format(parseISO(dueDate), ("eee, " + "MMM " + "dd"));
-        dueDate = parseISO(processCalendarFormData());
-    } else {
-        dueDate = '';
+const updatePage = () => {
+    saveLocal();
+    resetPage();
+    switch(_currView) {
+        case 'Project':
+            renderProject(getProject(_lastOpenedProject))
+            break;
+        case 'Task':
+            renderAllItems();
+            break;
+        default:
+            renderHome();
+            break;
     }
-    const priority = document.getElementById('priority-modal-input').value
-    const project  = document.getElementById('selectProject').value
-    return createItem(title, dueDate, priority, project)
+    updateSidebarMenu();
+    sortProjects();
 }
-
-function processCalendarFormData() {
-    const date = document.getElementById('modal-calendar').value;
-    // if(date) {
-    //     date = format(parseISO(dueDate), ("eee, " + "MMM " + "dd"));
-    // }
-    return date;
+const saveLocal = () => {
+    localStorage.setItem('savedProjects', JSON.stringify(_projects))
+    localStorage.setItem('lastOpenedProject', _lastOpenedProject)
+    localStorage.setItem('currView', _currView);
+    console.log('saved local')
 }
-
-function addProject(e) {
-    console.log('Adding project')
-    e.preventDefault();
-    const newProject = processProjectFormData();
-    newProject.color = document.getElementById('project-color-input').value;
-    console.log(newProject.color);
-    console.log('Successfully processed project form data')
-    _projects.push(newProject);
-    _lastOpenedProject = newProject.title;
-    updatePage();
-
-}
-
-function addItem(e) {
-    e.preventDefault();
-    const newItem = processItemFormData();
-    console.log('Succsesfully processed item form data')
-    const project = getProject(newItem.project);
-    let indexOfProject = _projects.findIndex((project) => project.title == newItem.project);
-    if(newItem.priority === 'Critical'){
-        _projects[indexOfProject].items.unshift(newItem)
-        resetForms();
-        updatePage();
-        return;
-    }  
-    
-    const firstIndex = findFirstCompletedItem(_projects[indexOfProject]);
-    console.log(`First completed index is ${firstIndex}`)
-    if(firstIndex !== null){
-        if(firstIndex == 0 || firstIndex == -1) {
-            console.log('UNSHIFITNG')
-            _projects[indexOfProject].items.unshift(newItem)
-        } else {
-            console.log('SPLICING')
-            _projects[indexOfProject].items.splice(firstIndex, 0, newItem);
+const restoreLocal = () => {
+    const projects = JSON.parse(localStorage.getItem('savedProjects'))
+    const lastOpenedProject = localStorage.getItem('lastOpenedProject');
+    const currView = localStorage.getItem('currView');
+    if(projects){
+        _projects = projects;
+        // localStorage cannot store objects, so the date property must be parsed
+        for(let project of _projects){
+            project.items.map((item) => {
+                if(item.dueDate !== ''){
+                    item.dueDate = parseISO(item.dueDate)
+                }
+                });
         }
     } else {
-        console.log('PUSHING')
-        _projects[indexOfProject].items.push(newItem);
-    }
-    
-    resetForms();
-    updatePage();
-
-    // closeAddItemModal();
-}
-
-function removeProject(projectToRemove) {
-    _projects = _projects.filter(proj => proj.title !== projectToRemove.title)   
-}
-
-function removeItem(itemToRemove) {
-    const project = getProject(itemToRemove.project);
-        project.items = project.items.filter((item) => item.title !== itemToRemove.title);
-    }
-
-
-function getProject(title) {
-    return _projects.find((project) => project.title === title);
-}
-
-function getNumberOfCompletedItems(project){
-    return project.items.filter((item) => item.isComplete).length;
-}
-
-function sortProjects() {
-    for(let i = 0; i < _projects.length; i++){
-        if(_projects[i].isComplete){
-            _projects.push(_projects.splice(i, 1)[0])
-        }
-    }
-}
-
-function renderProjectCards() {
-    const main = document.getElementById('main');
-    main.innerHTML = '';
-    // let projects = _projects;
-    // let completedProjects = _completedProjects;
-    if(_projects === null){
         _projects = [];
     }
 
-    if(_projects.length == 0){
-        main.appendChild(createPlaceholder());
-    }
-
-    for(let project of _projects){
-        let projectCard = createProjectCard(project);        
-        main.appendChild(projectCard);
-    }
- 
-
-    
-    console.log('Project cards rendered')
-}
-
-function renderHome() {
-    const main = document.getElementById('main');
-    const home = document.createElement('div');
-    home.id = 'home';
-    resetPage();
-    _currView = 'Home';
-    if(_projects.length === 0) {
-        home.appendChild(createPlaceholder());
+    if(lastOpenedProject){
+        _lastOpenedProject = lastOpenedProject;
     } else {
-        home.appendChild(createProjectsSummary());
+        _lastOpenedProject = undefined;
     }
-    main.appendChild(home);
-    saveLocal();
-}
-
-function createPlaceholder() {
-    const placeholder = document.createElement('div');
-    placeholder.textContent = 'Currently no projects';
-    placeholder.style.padding = '15px';
-    placeholder.style.fontSize = '2.0rem';
-    placeholder.style.fontStyle = 'italic';
-    placeholder.style.color = '#aaa';
-    return placeholder;
-}
-
-function createProjectsSummary() {
-    const main = document.getElementById('main');
-    const summary = document.createElement('div');
-    summary.id = 'projects-summary';
-    const summaryHeader = document.createElement('p');
-    summaryHeader.id = 'projects-summary-header';
-    summaryHeader.textContent = 'Projects summary:'
-    const cardContainer = document.createElement('div');
-    cardContainer.id = 'project-cards-container';
-    for(let project of _projects){
-        cardContainer.appendChild(createProjectSummaryCard(project));
+    if(currView){
+        _currView = currView;
+    } else {
+        _currView = 'Home';
     }
-    summary.appendChild(summaryHeader);
-    summary.appendChild(cardContainer);
-    return summary;
-}
-
-function createProjectSummaryCard(project) {
-    const card = document.createElement('div');
-    card.classList.add('project-card-mini');
-    card.style.border = `2px dotted ${project.color}`;
-
-    const title = document.createElement('p');
-    title.classList.add('project-card-mini-title');
-    title.textContent = `Project: ${project.title}`;
-
-    const number = document.createElement('div');
-    number.classList.add('project-card-mini-number');
-    number.textContent = `Tasks: ${project.items.length}`;
-
-    card.appendChild(title);
-    card.appendChild(number);
-    card.addEventListener('click', () => {
-        renderProject(project);
-    })
-    return card;
-}
-
-function renderProject(project) {
-    resetPage();
-    _currView = 'Project';
-    // if(project === undefined){
-    //     project = createProject('Default');
-    // }
-    if(!project){
-        const main = document.getElementById('main');
-        const placeholder = document.createElement('div');
-        placeholder.textContent = 'Currently no projects';
-        placeholder.style.padding = '15px';
-        placeholder.style.fontSize = '2.0rem';
-        placeholder.style.fontStyle = 'italic';
-        placeholder.style.color = '#aaa';
-        return main.appendChild(placeholder);
-    }
-    _lastOpenedProject = project.title;
-
-    const main = document.getElementById('main');
-    main.appendChild(createProjectCard(project));
-    saveLocal();
-}
-
-function renderAllItems() {
-    const main = document.getElementById('main');
-    const itemContainer = document.createElement('div');
-    itemContainer.id = 'all-items-container';
-    _currView = 'Task'
+    updatePage();
     
-
-    resetPage();
-    for(let project of _projects){
-        project.items.map((item) => itemContainer.appendChild(createItemCard(item)));
-    }
-    main.appendChild(itemContainer);
-    // updatePage();
-    saveLocal();
 }
 
-// base
-
+// BASE
+// ================================================================================================
 function createAppContainer() {
     const content = document.createElement('div');
     content.classList.add('content');
@@ -1099,7 +1093,6 @@ function createAppContainer() {
 
     return content;
 }
-
 function createSidebar() {
     const sidebar = document.createElement('div');
     sidebar.classList.add('sidebar');
@@ -1107,19 +1100,6 @@ function createSidebar() {
 
     return sidebar;
 }
-
-function makeProjectBold(){
-    // Currently broken
-    const projects = document.getElementsByClassName('sidebar-projects-dropdown-option');
-    for(let i = 0; i < projects.length; i++){
-        projects[i].classList.remove('sidebar-projects-dropdown-option-active');
-        console.log(projects[i]);
-        if(_currView === 'Project' && projects[i].textContent == _lastOpenedProject){
-            projects[i].classList.add('sidebar-projects-dropdown-option-active')
-        }
-    }
-}
-
 function createSidebarMenus() {
     const sidebar = document.getElementById('sidebar');
     sidebar.innerHTML = '';
@@ -1244,7 +1224,6 @@ function createSidebarMenus() {
 
     makeProjectBold();
 }
-
 function createHeader() {
     const header = document.createElement('header');
     const appLogo = document.createElement('div');
@@ -1258,7 +1237,54 @@ function createHeader() {
 
     return header;
 }
+function createAppNav() {
+    const addItemModal = document.getElementById('add-item-modal');
+    const projectCardNav = document.createElement('nav');
 
+    const addProjectBtn = document.createElement('button');
+    const addItemBtn = document.createElement('button');
+
+    addProjectBtn.classList.add('add-project-btn');
+    addProjectBtn.innerHTML = 'New project';
+    addProjectBtn.addEventListener('click', () => {
+        const addProjectModal = document.getElementById('add-project-modal');
+        addProjectModal.classList.toggle('modal-active');
+        if(addProjectModal.style.display === 'flex') {
+            addProjectModal.style.display = 'none';
+        } else {
+            addProjectModal.style.display = 'flex';
+        }
+    })
+
+    const left = document.createElement('div');
+    left.id = 'header-left';
+    left.classList.add('header-section')
+    const right = document.createElement('div');
+    right.id = 'header-right';
+    right.classList.add('header-section');
+
+    const loadDemoBtn = document.createElement('button');
+    loadDemoBtn.classList.add('header-button');
+    loadDemoBtn.innerHTML = 'Load demo';
+    loadDemoBtn.addEventListener('click', loadDemo);
+    
+
+    const clearLocalStorageBtn = document.createElement('button');
+    clearLocalStorageBtn.classList.add('clear-local-storage-btn');
+    clearLocalStorageBtn.innerHTML = 'Clear localStorage'
+    clearLocalStorageBtn.addEventListener('click', () => {
+        localStorage.clear();
+        console.log('localStorage cleared')
+    })
+    left.appendChild(addProjectBtn);
+    left.appendChild(createAddProjectModal())
+    projectCardNav.appendChild(left);
+    right.appendChild(loadDemoBtn);
+    right.appendChild(clearLocalStorageBtn);
+    projectCardNav.appendChild(right);
+
+    return projectCardNav;
+}
 function createMain() {
     const main = document.createElement('main');
     main.classList.add('main');
@@ -1267,7 +1293,6 @@ function createMain() {
 
     return main;
 }
-
 function createFooter() {
     const footer = document.createElement('footer');
     footer.classList.add('footer');
@@ -1275,7 +1300,6 @@ function createFooter() {
 
     return footer;
 }
-
 function initTodoApp() {
 
     const header = document.body.appendChild(createHeader());
@@ -1293,77 +1317,6 @@ function initTodoApp() {
     content.appendChild(createCalendarModal());
 
 
-}
-
-const updateSidebarMenu = () => {
-    const sidebarMenu = document.getElementById('sidebar-menus-container');
-    if(sidebarMenu === null){
-        return createSidebarMenus;
-    } else {
-        sidebarMenu.innerHTML = '';
-        createSidebarMenus();
-    }
-}
-
-function setWidthFromChars(input){
-    return input.style.width = (input.value.length) + 'ch';
-}
-
-const updatePage = () => {
-    saveLocal();
-    resetPage();
-    switch(_currView) {
-        case 'Project':
-            renderProject(getProject(_lastOpenedProject))
-            break;
-        case 'Task':
-            renderAllItems();
-            break;
-        default:
-            renderHome();
-            break;
-    }
-    updateSidebarMenu();
-    sortProjects();
-}
-
-const saveLocal = () => {
-    localStorage.setItem('savedProjects', JSON.stringify(_projects))
-    localStorage.setItem('lastOpenedProject', _lastOpenedProject)
-    localStorage.setItem('currView', _currView);
-    console.log('saved local')
-}
-
-const restoreLocal = () => {
-    const projects = JSON.parse(localStorage.getItem('savedProjects'))
-    const lastOpenedProject = localStorage.getItem('lastOpenedProject');
-    const currView = localStorage.getItem('currView');
-    if(projects){
-        _projects = projects;
-        // localStorage cannot store objects, so the date property must be parsed
-        for(let project of _projects){
-            project.items.map((item) => {
-                if(item.dueDate !== ''){
-                    item.dueDate = parseISO(item.dueDate)
-                }
-                });
-        }
-    } else {
-        _projects = [];
-    }
-
-    if(lastOpenedProject){
-        _lastOpenedProject = lastOpenedProject;
-    } else {
-        _lastOpenedProject = undefined;
-    }
-    if(currView){
-        _currView = currView;
-    } else {
-        _currView = 'Home';
-    }
-    updatePage();
-    
 }
 
 export default initTodoApp;
