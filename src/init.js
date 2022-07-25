@@ -1,6 +1,7 @@
 // import loadHome from './pages/home';
 import calendarIcon from "../icons/calendar.jpg";
 import priorityIcon from "../icons/exclamation.png"
+import logo from "../icons/himawari_logo_night_small.png"
 
 // TODO
 // Form validation
@@ -19,8 +20,8 @@ import priorityIcon from "../icons/exclamation.png"
 // Make dueDate an actual date, and only format it when it's used
 // createProjectFlag function instead of being a whole other card function
 
-// IDEAS
-// Home (Tasks due today, stats snapshot, projects summary) / This Week / Projects / Stats
+// FEATURE IDEAS
+// Home (Tasks due today, calendar, stats snapshot, projects summary) / This Week / Projects / Stats
 // Arrows pointing to certain tasks from the right - Alert! This task is due in 2 days! etc
 // Be able to tag projects by color
 // Communicate priority by border around OR just color the circle differently
@@ -33,6 +34,10 @@ import priorityIcon from "../icons/exclamation.png"
 // Preference to send completed tasks to beginning or end or list
 // Footer can have switches (mode, sorting, etc)
 // Remove task button
+
+// BRANDING IDEAS
+// Himawari.io - sunflower theme - low priority = bud with one leaf, overdue tasks could have dying one
+// solros.io
 
 
 
@@ -1174,8 +1179,13 @@ function createSidebarMenus() {
 
 function createHeader() {
     const header = document.createElement('header');
+    const appLogo = document.createElement('div');
+    appLogo.id = 'header-logo';
+    // appLogo.src = logo;
+    appLogo.innerHTML = 'H🌻mawari';
     header.classList.add('header');
     header.id = 'header';
+    header.appendChild(appLogo);
     header.appendChild(createAppNav());
 
     return header;

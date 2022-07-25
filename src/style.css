@@ -9,11 +9,24 @@ html, body {
 }
 
 #header {
-    padding: 10px;
+    /* padding: 10px; */
     height: 35px;
+    
     background-color: rgb(28, 41, 58);
     display: flex;
     align-items: center;   
+}
+
+#header-logo {
+    font-family: 'Courier New', Courier, monospace;
+    background-color: rgb(0, 0, 0);
+    padding: 10px;
+    color: white;
+    font-size: 2.0rem;
+    font-style: italic;
+    width: 205px;
+    height: 50px;
+    margin-right: 25px;
 }
 
 #header-left,
@@ -129,7 +142,7 @@ nav {
 }
 
 .collapsible {
-    background-color: rgb(225, 236, 172);
+    background-color: rgb(242, 248, 213);
     cursor: pointer;
     padding: 8px;
     color:rgb(0, 0, 0);
