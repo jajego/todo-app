@@ -1,7 +1,7 @@
 // import loadHome from './pages/home';
 import calendarIcon from "../icons/calendar.jpg";
 import priorityIcon from "../icons/exclamation.png"
-import logo from "../icons/himawari_logo_night_small.png"
+import logo from "../icons/himawari_logo_small.png"
 
 // TODO
 // Form validation
@@ -498,7 +498,7 @@ function createItemCard(item) {
     // itemContentContainer.appendChild(itemPriority);
     itemCard.appendChild(content);
 
-    
+    flagContainer.appendChild(createPriorityFlag(item));
     if(item.dueDate !== ''){
         // itemDueDate.textContent = `Due: ${item.dueDate}`;
         flagContainer.appendChild(createDateFlag(item));
@@ -530,6 +530,7 @@ function renderAllItems() {
 // ================================================================================================
 function createProjectFlag(item) {
     const flagContainer = document.createElement('div');
+    flagContainer.classList.add('flag-container');
     flagContainer.classList.add('project-flag-container');
     const flag = document.createElement('div');
     flag.classList.add('project-flag');
@@ -548,6 +549,7 @@ function createProjectFlag(item) {
 function createDateFlag(item) {
     const dueDate = format(item.dueDate, "eee, " + "MMM " + "do");
     const flagContainer = document.createElement('div');
+    flagContainer.classList.add('flag-container');
     flagContainer.classList.add('due-flag-container');
     const flag = document.createElement('div');
     const flagIcon = document.createElement('div')
@@ -555,6 +557,35 @@ function createDateFlag(item) {
     flagIcon.classList.add('item-card-flag-icon');
     flag.textContent = dueDate;
     flag.classList.add('due-flag');
+    flagContainer.appendChild(flagIcon);
+    flagContainer.appendChild(flag);
+    return flagContainer;
+}
+function createPriorityFlag(item){
+    const priority = item.priority;
+    const flagContainer = document.createElement('div');
+    flagContainer.classList.add('flag-container');
+    flagContainer.classList.add('priority-flag-container');
+    const flag = document.createElement('div');
+    const flagIcon = document.createElement('div');
+    flagIcon.classList.add('item-card-flag-icon');
+    switch(priority) {
+        case 'Low':
+            flagIcon.textContent = '🌱';
+            break;
+        case 'Medium':
+            flagIcon.textContent = '🏵️';
+            break;
+        case 'High':
+            flagIcon.textContent = '💐';
+            break;
+        case 'Critical':
+            flagIcon.textContent = '🥀🥀🥀';
+            break;
+            
+    }
+    flag.textContent = priority;
+    flag.classList.add('priority-flag');
     flagContainer.appendChild(flagIcon);
     flagContainer.appendChild(flag);
     return flagContainer;
@@ -1228,7 +1259,7 @@ function createHeader() {
     const header = document.createElement('header');
     const appLogo = document.createElement('div');
     appLogo.id = 'header-logo';
-    // appLogo.src = logo;
+    appLogo.src = logo;
     appLogo.innerHTML = 'H🌻mawari';
     header.classList.add('header');
     header.id = 'header';

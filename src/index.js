@@ -4,6 +4,6 @@ import Project from "./init";
 import './style.css';
 import calendarIcon from "../icons/calendar.jpg";
 import priorityIcon from "../icons/exclamation.png"
-import logo from "../icons/himawari_logo_night_small.png"
+import logo from "../icons/himawari_logo_small.png"
 
 initTodoApp();

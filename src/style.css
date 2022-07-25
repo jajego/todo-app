@@ -32,6 +32,10 @@ html, body {
     margin-bottom: 10px;
 }
 
+/* #header-logo {
+    width: fit-content;
+} */
+
 #header-left,
 #header-right {
     display: flex;
@@ -673,8 +677,7 @@ input {
 
 
 
-.project-flag-container,
-.due-flag-container {
+.flag-container {
     background-color: rgb(255, 255, 255);
     display: flex;
     align-items: center;
