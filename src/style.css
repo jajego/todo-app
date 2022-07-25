@@ -150,6 +150,7 @@ nav {
 
 .collapsible {
     background-color: rgb(221, 221, 221);
+    font-size: 1.25rem;
     cursor: pointer;
     padding: 8px;
     color:rgb(0, 0, 0);

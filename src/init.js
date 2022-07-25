@@ -17,7 +17,6 @@ import logo from "../icons/himawari_logo_night_small.png"
 // Item modals + project modal all need fine tuning - close options, appearing in the right places, etc.
 // When a task is completed in All tasks view, it should not render the project
 // Absolute positioning isn't working with px values as it depends on monitor
-// Make dueDate an actual date, and only format it when it's used
 
 // FEATURE IDEAS
 // Home (Tasks due today, calendar, stats snapshot, projects summary) / This Week / Projects / Stats
@@ -996,6 +995,41 @@ function renderProjectCards() {
     console.log('Project cards rendered')
 }
 
+function renderHome() {
+    resetPage();
+    _currView = 'Home';
+    createProjectsSummary();
+    saveLocal();
+}
+
+function createProjectsSummary() {
+    const main = document.getElementById('main');
+    for(let project of _projects){
+        main.appendChild(createProjectSummaryCard(project));
+    }
+}
+
+function createProjectSummaryCard(project) {
+    const card = document.createElement('div');
+    card.classList.add('project-card-mini');
+    card.style.border = `2px solid ${project.color}`;
+
+    const title = document.createElement('p');
+    title.classList.add('project-card-mini-title');
+    title.textContent = `Project: ${project.title}`;
+
+    const number = document.createElement('div');
+    number.classList.add('project-card-mini-number');
+    number.textContent = `Tasks: ${project.items.length}`;
+
+    card.appendChild(title);
+    card.appendChild(number);
+    card.addEventListener('click', () => {
+        renderProject(project);
+    })
+    return card;
+}
+
 function renderProject(project) {
     resetPage();
     _currView = 'Project';
@@ -1071,6 +1105,18 @@ function createSidebarMenus() {
     const menuContainer = document.createElement('div');
     menuContainer.id = 'sidebar-menus-container';
 
+    const homeMenuTitle = document.createElement('p');
+    homeMenuTitle.id = 'home-menu-title';
+    homeMenuTitle.classList.add('menu-title');
+    homeMenuTitle.classList.add('collapsible');
+    homeMenuTitle.textContent = '🏠Home';
+    homeMenuTitle.addEventListener('click', () => {
+        homeMenuTitle.classList.add('sidebar-menu-active');
+        renderHome();
+    });
+    menuContainer.appendChild(homeMenuTitle);
+    
+
     const projectMenuTitle = document.createElement('p');
     projectMenuTitle.id = 'project-menu-title';
     projectMenuTitle.classList.add('menu-title');
@@ -1086,7 +1132,6 @@ function createSidebarMenus() {
             projects.style.display = 'none';
         }
     })
-
 
     menuContainer.appendChild(projectMenuTitle);
 
@@ -1106,6 +1151,7 @@ function createSidebarMenus() {
         projOption.classList.add('sidebar-option');
         const projectTitle = document.createElement('p');
         const numberOfItems = document.createElement('p');
+        // numberOfItems.style.border = `1px solid ${project.color}`
         const numberOfCompleteItems = getNumberOfCompletedItems(project);
         numberOfItems.classList.add('project-items-number');
         numberOfItems.innerText = `(${project.items.length - numberOfCompleteItems})`;
@@ -1245,12 +1291,19 @@ function setWidthFromChars(input){
 const updatePage = () => {
     saveLocal();
     resetPage();
-    renderProject(getProject(_lastOpenedProject))
-    // updateDropdown();
+    switch(_currView) {
+        case 'Project':
+            renderProject(getProject(_lastOpenedProject))
+            break;
+        case 'Task':
+            renderAllItems();
+            break;
+        default:
+            renderHome();
+            break;
+    }
     updateSidebarMenu();
     sortProjects();
-    // sortItems();
-    // renderProjectCards();
 }
 
 const saveLocal = () => {
