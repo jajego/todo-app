@@ -975,14 +975,7 @@ function renderProjectCards() {
     }
 
     if(_projects.length == 0){
-        const placeholder = document.createElement('div');
-        placeholder.classList.add('projects-placeholder')
-        const placeholderText = document.createElement('p');
-        placeholderText.classList.add('projects-placeholder-text')
-        placeholderText.innerHTML = `<p>Your projects will go here!</p>
-                                     <p>Click <b>"Add project"</b> to get started.</p>'`
-        placeholder.appendChild(placeholderText);
-        main.appendChild(placeholder);
+        main.appendChild(createPlaceholder());
     }
 
     for(let project of _projects){
@@ -996,23 +989,51 @@ function renderProjectCards() {
 }
 
 function renderHome() {
+    const main = document.getElementById('main');
+    const home = document.createElement('div');
+    home.id = 'home';
     resetPage();
     _currView = 'Home';
-    createProjectsSummary();
+    if(_projects.length === 0) {
+        home.appendChild(createPlaceholder());
+    } else {
+        home.appendChild(createProjectsSummary());
+    }
+    main.appendChild(home);
     saveLocal();
+}
+
+function createPlaceholder() {
+    const placeholder = document.createElement('div');
+    placeholder.textContent = 'Currently no projects';
+    placeholder.style.padding = '15px';
+    placeholder.style.fontSize = '2.0rem';
+    placeholder.style.fontStyle = 'italic';
+    placeholder.style.color = '#aaa';
+    return placeholder;
 }
 
 function createProjectsSummary() {
     const main = document.getElementById('main');
+    const summary = document.createElement('div');
+    summary.id = 'projects-summary';
+    const summaryHeader = document.createElement('p');
+    summaryHeader.id = 'projects-summary-header';
+    summaryHeader.textContent = 'Projects summary:'
+    const cardContainer = document.createElement('div');
+    cardContainer.id = 'project-cards-container';
     for(let project of _projects){
-        main.appendChild(createProjectSummaryCard(project));
+        cardContainer.appendChild(createProjectSummaryCard(project));
     }
+    summary.appendChild(summaryHeader);
+    summary.appendChild(cardContainer);
+    return summary;
 }
 
 function createProjectSummaryCard(project) {
     const card = document.createElement('div');
     card.classList.add('project-card-mini');
-    card.style.border = `2px solid ${project.color}`;
+    card.style.border = `2px dotted ${project.color}`;
 
     const title = document.createElement('p');
     title.classList.add('project-card-mini-title');
@@ -1093,7 +1114,7 @@ function makeProjectBold(){
     for(let i = 0; i < projects.length; i++){
         projects[i].classList.remove('sidebar-projects-dropdown-option-active');
         console.log(projects[i]);
-        if(projects[i].textContent == _lastOpenedProject){
+        if(_currView === 'Project' && projects[i].textContent == _lastOpenedProject){
             projects[i].classList.add('sidebar-projects-dropdown-option-active')
         }
     }

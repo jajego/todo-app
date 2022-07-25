@@ -135,14 +135,13 @@ nav {
 
 }
 
+/* sidebar  */
 #sidebar {
     width: 225px;
     height: auto;
     background-color: rgb(255, 255, 255);
 
 }
-
-
 
 .menu-title {
     font-size: 1.5rem;
@@ -163,8 +162,6 @@ nav {
     background-color: #ccc;
 }
 
-
-
 #sidebar-projects-dropdown,
 #sidebar-tasks-dropdown {
     /* display: none; */
@@ -174,8 +171,6 @@ nav {
     align-items: flex-end;
     list-style-type: none;
 }
-
-
 
 .sidebar-projects-dropdown-option,
 .sidebar-tasks-dropdown-option {
@@ -247,7 +242,14 @@ input {
     height: 35px;
 }
 
+#home {
+    width: inherit;
+    height: inherit;
+    padding: 30px;
+    display: grid;
+}
 
+/* project-card */
 
 .project-card {
     display: flex;
@@ -292,6 +294,63 @@ input {
     color:rgb(43, 43, 43);
 }
 
+/* summary and mini cards */
+
+#projects-summary {
+    font-size: 1.5rem;
+    font-style: italic;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    height: 500px;
+    width: 300px;
+    padding: 30px;
+    border: 2px solid white;
+    border-radius: 15px;
+    color: white;
+    background-color: black;
+}
+
+#projects-summary-header {
+    font-family:'Courier New', Courier, monospace
+}
+
+#project-cards-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    gap: 10px;
+    width: 100%;
+    height: 100%;
+
+}
+
+.project-card-mini {
+    display: flex;
+    flex-direction: column;
+    width: fit-content;
+    min-width: 250px;
+    border-radius: 10px;
+    padding: 10px;
+    background-color: white;
+    color: black;
+}
+
+.project-card-mini:hover {
+    background-color: #ddd;
+    cursor: pointer;
+}
+
+.project-card-mini-title {
+    font-size: 1.25rem;
+    
+}
+
+.project-card-mini-number {
+    font-size: 1.0rem;
+}
+
+/* rename project modal */
 
 #rename-title-form {
     display: flex;
@@ -503,23 +562,15 @@ input {
 .item-card {
     display: flex;
     flex-direction: column;
-    /* justify-content: space-between;
-    align-items: center; */
     background-color: rgb(255, 255, 255);
     margin-right: 45px;
     margin-bottom: 15px;
     padding: 15px;
     min-width: 300px;
     width: fit-content;
-    /* padding-left: 0; */
     border: 1px solid rgb(35, 40, 43);
     border-radius: 15px;
-    /* border-top-right-radius: 15px;
-    border-bottom-right-radius: 15px; */
-    /* box-shadow: -4px 4px rgb(238, 78, 78); */
-    /* transition: .1s; */
     color: rgb(73, 73, 73);
-    /* box-shadow: none; */
     transition-duration: 0.2s;
    
 }
