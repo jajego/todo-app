@@ -19,6 +19,7 @@ import logo from "../icons/himawari_logo_small.png"
 // Absolute positioning isn't working with px values as it depends on monitor
 // Add 'Add project' button to Projects collapsible
 // Are they Tasks or are they Items?
+// Page extending beyond footer when there's many todos (2-3 columns)
 
 // FEATURE IDEAS
 // Home (Tasks due today, calendar, stats snapshot, projects summary) / This Week / Projects / Stats
@@ -574,13 +575,14 @@ function createPriorityFlag(item){
             flagIcon.textContent = '🌱';
             break;
         case 'Medium':
-            flagIcon.textContent = '🏵️';
+            flagIcon.textContent = '🌼';
             break;
         case 'High':
-            flagIcon.textContent = '💐';
+        // maybe rose?
+            flagIcon.textContent = '🌺';
             break;
         case 'Critical':
-            flagIcon.textContent = '🥀🥀🥀';
+            flagIcon.textContent = '🥀';
             break;
             
     }
