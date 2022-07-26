@@ -363,9 +363,9 @@ function createProjectCard(project) {
     projectCard.appendChild(addItemBtn);
     projectCard.appendChild(itemModal);
 
-
     for(let item of project.items){
         const itemCard = createItemCard(item);
+        // const itemFlags = createFlags(item);
         itemCard.addEventListener('mouseover', () => {
             itemCard.style.boxShadow = `-4px 4px ${project.color}`;
         })
@@ -373,11 +373,10 @@ function createProjectCard(project) {
             itemCard.style.boxShadow = 'none'
         } )
         itemCardContainer.appendChild(itemCard);
+        // itemCardContainer.appendChild(itemFlags);
     }
    
     projectCard.appendChild(itemCardContainer);
-    
-
 
     return projectCard;
 }
@@ -511,6 +510,20 @@ function createItemCard(item) {
     console.log(`item.dueDate is ${item.dueDate}`);
     return itemCard;
 }
+
+function createFlags(item){
+    const flagContainer        = document.createElement('div');
+    flagContainer.classList.add('flag-container')
+    flagContainer.appendChild(createPriorityFlag(item));
+    if(item.dueDate !== ''){
+        // itemDueDate.textContent = `Due: ${item.dueDate}`;
+        flagContainer.appendChild(createDateFlag(item));
+    }
+    if(_currView === 'Task'){
+        flagContainer.appendChild(createProjectFlag(item));
+    }
+    return flagContainer;
+}
 function renderAllItems() {
     const main = document.getElementById('main');
     const itemContainer = document.createElement('div');
@@ -554,7 +567,7 @@ function createDateFlag(item) {
     flagContainer.classList.add('due-flag-container');
     const flag = document.createElement('div');
     const flagIcon = document.createElement('div')
-    flagIcon.textContent = `⏲️ `;
+    flagIcon.textContent = `🗓`;
     flagIcon.classList.add('item-card-flag-icon');
     flag.textContent = dueDate;
     flag.classList.add('due-flag');
